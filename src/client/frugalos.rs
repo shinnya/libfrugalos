@@ -209,4 +209,9 @@ impl Client {
     pub fn take_snapshot(&self) -> impl Future<Item = (), Error = Error> {
         Response(frugalos::TakeSnapshotRpc::client(&self.rpc_service).call(self.server, ()))
     }
+
+    /// データの同期を実行する。
+    pub fn synchronize(&self) -> impl Future<Item = (), Error = Error> {
+        Response(frugalos::SynchronizeRpc::client(&self.rpc_service).call(self.server, ()))
+    }
 }

@@ -291,3 +291,19 @@ impl Call for TakeSnapshotRpc {
     type ResDecoder = BincodeDecoder<Self::Res>;
     type ResEncoder = BincodeEncoder<Self::Res>;
 }
+
+/// データ同期RPC。
+#[derive(Debug)]
+pub struct SynchronizeRpc;
+impl Call for SynchronizeRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0002);
+    const NAME: &'static str = "frugalos.ctrl.synchronize";
+
+    type Req = ();
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+
+    type Res = Result<()>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
