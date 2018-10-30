@@ -20,3 +20,7 @@ libc = "0.2"
 serde = "1"
 serde_derive = "1"
 trackable = { version = "0.2", features = ["serialize"] }
+
+# allow u128, i128
+[dependencies.bincode]
+features = ["i128"]
