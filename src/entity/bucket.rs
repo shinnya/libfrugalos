@@ -2,6 +2,7 @@
 use std::cmp;
 
 use entity::device::DeviceId;
+use entity::object::ObjectSummary;
 
 // FIXME: 構造体に置き換える
 /// バケツのID。
@@ -242,4 +243,15 @@ pub struct DispersedBucket {
 
     /// ErasureCodingのデータフラグメント数。
     pub data_fragment_count: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct BucketInspection {
+    objects: Vec<ObjectSummary>,
+}
+
+impl BucketInspection {
+    pub fn new(objects: Vec<ObjectSummary>) -> Self {
+        BucketInspection { objects }
+    }
 }

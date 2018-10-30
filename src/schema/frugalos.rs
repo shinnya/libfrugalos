@@ -5,8 +5,8 @@ use std::collections::BTreeSet;
 use std::ops::Range;
 use std::time::Duration;
 
-use entity::bucket::BucketId;
-use entity::device::DeviceId;
+use entity::bucket::{BucketId, BucketInspection};
+use entity::device::{DeviceId, PhysicalDeviceInspection};
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
@@ -239,6 +239,20 @@ pub struct PutObjectRequest {
     pub expect: Expect,
 }
 
+/// バケツ単位でのRPC要求。
+#[allow(missing_docs)]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct BucketRequest {
+    pub bucket_id: BucketId,
+}
+
+/// デバイス単位でのRPC要求。
+#[allow(missing_docs)]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeviceRequest {
+    pub device_id: DeviceId,
+}
+
 /// セグメント単位でのRPC要求。
 #[allow(missing_docs)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -304,6 +318,38 @@ impl Call for SynchronizeRpc {
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<()>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
+
+/// DUMP LUMP RPC
+#[derive(Debug)]
+pub struct InspectBucketRpc;
+impl Call for InspectBucketRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0003);
+    const NAME: &'static str = "frugalos.ctrl.inspect_bucket";
+
+    type Req = BucketRequest;
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+
+    type Res = Result<BucketInspection>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
+
+/// Inspect Physical Device
+#[derive(Debug)]
+pub struct InspectPhysicalDeviceRpc;
+impl Call for InspectPhysicalDeviceRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0004);
+    const NAME: &'static str = "frugalos.ctrl.inspect_physical_device";
+
+    type Req = DeviceRequest;
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+
+    type Res = Result<PhysicalDeviceInspection>;
     type ResDecoder = BincodeDecoder<Self::Res>;
     type ResEncoder = BincodeEncoder<Self::Res>;
 }

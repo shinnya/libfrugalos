@@ -249,6 +249,21 @@ impl FileDevice {
     }
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PhysicalDeviceInspection {
+    device_id: DeviceId,
+    native_ids_in_device: Vec<u128>,
+}
+
+impl PhysicalDeviceInspection {
+    pub fn new(device_id: DeviceId, native_ids_in_device: Vec<u128>) -> Self {
+        PhysicalDeviceInspection {
+            device_id,
+            native_ids_in_device,
+        }
+    }
+}
+
 #[cfg(target_os = "macos")]
 fn calc_available_space(path: &std::ffi::CString) -> Result<u64> {
     // on OS X,

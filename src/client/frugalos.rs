@@ -8,8 +8,8 @@ use std::ops::Range;
 use std::time::Duration;
 
 use super::Response;
-use entity::bucket::BucketId;
-use entity::device::DeviceId;
+use entity::bucket::{BucketId, BucketInspection};
+use entity::device::{DeviceId, PhysicalDeviceInspection};
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
@@ -213,5 +213,26 @@ impl Client {
     /// データの同期を実行する。
     pub fn synchronize(&self) -> impl Future<Item = (), Error = Error> {
         Response(frugalos::SynchronizeRpc::client(&self.rpc_service).call(self.server, ()))
+    }
+
+    /// セグメント情報を取得する。
+    pub fn inspect_bucket(
+        &self,
+        bucket_id: BucketId,
+    ) -> impl Future<Item = BucketInspection, Error = Error> {
+        let request = frugalos::BucketRequest { bucket_id };
+        Response(frugalos::InspectBucketRpc::client(&self.rpc_service).call(self.server, request))
+    }
+
+    /// 物理デバイス情報を取得する。
+    pub fn inspect_physical_device(
+        &self,
+        device_id: DeviceId,
+    ) -> impl Future<Item = PhysicalDeviceInspection, Error = Error> {
+        let request = frugalos::DeviceRequest { device_id };
+        Response(
+            frugalos::InspectPhysicalDeviceRpc::client(&self.rpc_service)
+                .call(self.server, request),
+        )
     }
 }
