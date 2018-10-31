@@ -251,8 +251,8 @@ impl FileDevice {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PhysicalDeviceInspection {
-    device_id: DeviceId,
-    native_ids_in_device: Vec<u128>,
+    pub device_id: DeviceId,
+    pub native_ids_in_device: Vec<u128>,
 }
 
 impl PhysicalDeviceInspection {

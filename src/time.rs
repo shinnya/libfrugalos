@@ -14,3 +14,22 @@ impl From<Seconds> for Duration {
         Duration::from_secs(f.0)
     }
 }
+
+/// Defines predefined constants for ease of use.
+pub mod consts {
+    use super::*;
+
+    /// This value equals to Seconds(0).
+    ///
+    /// ```rust
+    /// assert_eq!(ZERO_SECONDS.0, 0)
+    /// ```
+    pub const ZERO_SECONDS: Seconds = Seconds(0);
+
+    /// This value equals to Seconds(1).
+    ///
+    /// ```rust
+    /// assert_eq!(ONE_SECONDS.0, 1)
+    /// ```
+    pub const ONE_SECONDS: Seconds = Seconds(1);
+}
