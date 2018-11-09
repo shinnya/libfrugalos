@@ -2,12 +2,14 @@
 use fibers_rpc::client::ClientServiceHandle as RpcServiceHandle;
 use fibers_rpc::Call as RpcCall;
 use futures::Future;
+use std::collections::BTreeSet;
 use std::net::SocketAddr;
 use std::ops::Range;
 use std::time::Duration;
 
 use super::Response;
 use entity::bucket::BucketId;
+use entity::device::{DeviceId, PhysicalDeviceInspection};
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
@@ -175,6 +177,52 @@ impl Client {
         };
         Response(
             frugalos::DeleteObjectsByPrefixRpc::client(&self.rpc_service)
+                .call(self.server, request),
+        )
+    }
+
+    /// Executes `PhysicalDeleteObjectSetRpc`.
+    pub fn delete_from_device_by_object_ids(
+        &self,
+        bucket_id: BucketId,
+        device_id: DeviceId,
+        object_ids: BTreeSet<ObjectId>,
+    ) -> impl Future<Item = (), Error = Error> {
+        Response(
+            frugalos::DeleteObjectSetFromDeviceRpc::client(&self.rpc_service).call(
+                self.server,
+                frugalos::DeleteObjectSetFromDeviceRequest {
+                    bucket_id,
+                    device_id,
+                    object_ids,
+                },
+            ),
+        )
+    }
+
+    /// Executes `RepairObjectRpc`.
+    pub fn repair_by_ids(
+        &self,
+        bucket_id: BucketId,
+        object_ids: BTreeSet<ObjectId>,
+    ) -> impl Future<Item = (), Error = Error> {
+        Response(frugalos::RepairObjectRpc::client(&self.rpc_service).call(
+            self.server,
+            frugalos::ObjectSetRequest {
+                bucket_id,
+                object_ids,
+            },
+        ))
+    }
+
+    /// 物理デバイス情報を取得する。
+    pub fn inspect_physical_device(
+        &self,
+        device_id: DeviceId,
+    ) -> impl Future<Item = PhysicalDeviceInspection, Error = Error> {
+        let request = frugalos::DeviceRequest { device_id };
+        Response(
+            frugalos::InspectPhysicalDeviceRpc::client(&self.rpc_service)
                 .call(self.server, request),
         )
     }

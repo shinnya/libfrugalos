@@ -1,10 +1,12 @@
 //! frugalosの公開API系RPCのスキーマ定義。
 use bytecodec::bincode_codec::{BincodeDecoder, BincodeEncoder};
 use fibers_rpc::{Call, ProcedureId};
+use std::collections::BTreeSet;
 use std::ops::Range;
 use std::time::Duration;
 
 use entity::bucket::BucketId;
+use entity::device::{DeviceId, PhysicalDeviceInspection};
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
@@ -181,6 +183,16 @@ pub struct ObjectRequest {
     pub expect: Expect,
 }
 
+/// This struct represents how to process multiple objects at once.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct ObjectSetRequest {
+    /// a bucket which owns the target objects
+    pub bucket_id: BucketId,
+
+    /// objects to be repaired
+    pub object_ids: BTreeSet<ObjectId>,
+}
+
 /// バージョン単位のRPC要求。
 #[allow(missing_docs)]
 #[derive(Debug, Serialize, Deserialize)]
@@ -229,6 +241,26 @@ pub struct SegmentRequest {
     pub segment: u16,
 }
 
+/// This struct represents how to delete objects from a device at once.
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeleteObjectSetFromDeviceRequest {
+    /// a bucket which owns the objects
+    pub bucket_id: BucketId,
+
+    /// a device which may own the objects
+    pub device_id: DeviceId,
+
+    /// objects to be deleted
+    pub object_ids: BTreeSet<ObjectId>,
+}
+
+/// デバイス単位でのRPC要求。
+#[allow(missing_docs)]
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeviceRequest {
+    pub device_id: DeviceId,
+}
+
 /// プロセス停止RPC。
 #[derive(Debug)]
 pub struct StopRpc;
@@ -257,6 +289,52 @@ impl Call for TakeSnapshotRpc {
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<()>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
+
+/// A RPC for repairing objects.
+#[derive(Debug)]
+pub struct RepairObjectRpc;
+impl Call for RepairObjectRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0002);
+    const NAME: &'static str = "frugalos.ctrl.repair_object";
+
+    type Req = ObjectSetRequest;
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+
+    type Res = Result<()>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
+
+/// A RPC for deleting objects physically.
+#[derive(Debug)]
+pub struct DeleteObjectSetFromDeviceRpc;
+impl Call for DeleteObjectSetFromDeviceRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0003);
+    const NAME: &'static str = "frugalos.ctrl.delete_object_set_from_device";
+
+    type Req = DeleteObjectSetFromDeviceRequest;
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+
+    type Res = Result<()>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
+
+/// Inspect Physical Device
+#[derive(Debug)]
+pub struct InspectPhysicalDeviceRpc;
+impl Call for InspectPhysicalDeviceRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0004);
+    const NAME: &'static str = "frugalos.ctrl.inspect_physical_device";
+    type Req = DeviceRequest;
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type Res = Result<PhysicalDeviceInspection>;
     type ResDecoder = BincodeDecoder<Self::Res>;
     type ResEncoder = BincodeEncoder<Self::Res>;
 }
