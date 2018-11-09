@@ -11,6 +11,9 @@ use {Error, ErrorKind, Result};
 /// デバイスのID。
 pub type DeviceId = String;
 
+/// the sequence number of devices, which is increased monotonically.
+pub type DeviceNo = u32;
+
 /// デバイスの内容の要約。
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeviceSummary {
@@ -242,6 +245,24 @@ impl FileDevice {
             Ok((available_space / 100) * 99)
         } else {
             Ok(self.capacity)
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+/// TODO
+pub struct PhysicalDeviceInspection {
+    /// the device id
+    pub device_id: DeviceId,
+    /// native ids
+    pub native_ids_in_device: Vec<u128>,
+}
+impl PhysicalDeviceInspection {
+    /// new suru
+    pub fn new(device_id: DeviceId, native_ids_in_device: Vec<u128>) -> Self {
+        PhysicalDeviceInspection {
+            device_id,
+            native_ids_in_device,
         }
     }
 }
