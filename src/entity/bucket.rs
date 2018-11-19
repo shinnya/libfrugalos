@@ -1,5 +1,6 @@
 //! バケツ関連のエンティティ定義。
 use std::cmp;
+use ::time::Seconds;
 
 use entity::device::DeviceId;
 
@@ -57,6 +58,7 @@ impl Default for Bucket {
             device: String::new(),
             segment_count: 0,
             tolerable_faults: 0,
+            default_put_content_timeout: Seconds(0),
         })
     }
 }
@@ -163,6 +165,15 @@ impl Bucket {
             Bucket::Dispersed(ref b) => b.seqno,
         }
     }
+
+    /// Returns the default timeout in seconds.
+    pub fn default_put_content_timeout(&self) -> Seconds {
+        match *self {
+            Bucket::Metadata(ref b) => b.default_put_content_timeout,
+            Bucket::Replicated(ref b) => b.default_put_content_timeout,
+            Bucket::Dispersed(ref b) => b.default_put_content_timeout,
+        }
+    }
 }
 
 /// メタデータ用のバケツ。
@@ -189,6 +200,10 @@ pub struct MetadataBucket {
 
     /// 故障耐性数。
     pub tolerable_faults: u32,
+
+    /// Specifies the default amount of time in seconds.
+    /// This parameter is relative to the current time.
+    pub default_put_content_timeout: Seconds,
 }
 
 /// 複製による冗長化を行うバケツ。
@@ -214,6 +229,10 @@ pub struct ReplicatedBucket {
     ///
     /// `tolerable_faults + 1`が複製の数となる。
     pub tolerable_faults: u32,
+
+    /// Specifies the default amount of time in seconds.
+    /// This parameter is relative to the current time.
+    pub default_put_content_timeout: Seconds,
 }
 
 /// ErasureCodingによる冗長化を行うバケツ。
@@ -242,4 +261,8 @@ pub struct DispersedBucket {
 
     /// ErasureCodingのデータフラグメント数。
     pub data_fragment_count: u32,
+
+    /// Specifies the default amount of time in seconds.
+    /// This parameter is relative to the current time.
+    pub default_put_content_timeout: Seconds,
 }
