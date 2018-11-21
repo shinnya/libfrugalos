@@ -6,7 +6,7 @@ use std::ops::Range;
 use std::time::Duration;
 
 use entity::bucket::{BucketId, BucketInspection};
-use entity::device::{DeviceId, PhysicalDeviceInspection};
+use entity::device::DeviceId;
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
@@ -334,22 +334,6 @@ impl Call for InspectBucketRpc {
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<BucketInspection>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
-}
-
-/// Inspect Physical Device
-#[derive(Debug)]
-pub struct InspectPhysicalDeviceRpc;
-impl Call for InspectPhysicalDeviceRpc {
-    const ID: ProcedureId = ProcedureId(0x000a_0004);
-    const NAME: &'static str = "frugalos.ctrl.inspect_physical_device";
-
-    type Req = DeviceRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
-
-    type Res = Result<PhysicalDeviceInspection>;
     type ResDecoder = BincodeDecoder<Self::Res>;
     type ResEncoder = BincodeEncoder<Self::Res>;
 }
