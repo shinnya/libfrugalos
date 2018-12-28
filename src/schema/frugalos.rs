@@ -291,3 +291,20 @@ impl Call for TakeSnapshotRpc {
     type ResDecoder = BincodeDecoder<Self::Res>;
     type ResEncoder = BincodeEncoder<Self::Res>;
 }
+
+/// ノード停止RPC。
+#[derive(Debug)]
+pub struct StopNodeRpc;
+impl Call for StopNodeRpc {
+    const ID: ProcedureId = ProcedureId(0x000a_0003);
+    const NAME: &'static str = "frugalos.ctrl.stop";
+
+    type Req = ();
+    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>;
+
+    type Res = Result<()>;
+    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = BincodeEncoder<Self::Res>;
+}
+
