@@ -10,6 +10,7 @@ use std::time::Duration;
 use super::Response;
 use entity::bucket::BucketId;
 use entity::device::DeviceId;
+use entity::node::RemoteNodeId;
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
@@ -30,6 +31,11 @@ impl Client {
             server,
             rpc_service,
         }
+    }
+
+    /// `StopNodeRpc` を実行する。
+    pub fn stop_node(&self, node_id: RemoteNodeId) -> impl Future<Item = (), Error = Error> {
+        Response(frugalos::StopNodeRpc::client(&self.rpc_service).call(self.server, node_id))
     }
 
     /// `GetObjectRpc`を実行する。

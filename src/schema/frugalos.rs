@@ -10,6 +10,7 @@ use entity::device::DeviceId;
 use entity::object::{
     DeleteObjectsByPrefixSummary, ObjectId, ObjectPrefix, ObjectSummary, ObjectVersion,
 };
+use entity::node::RemoteNodeId;
 use expect::Expect;
 use Result;
 
@@ -297,9 +298,9 @@ impl Call for TakeSnapshotRpc {
 pub struct StopNodeRpc;
 impl Call for StopNodeRpc {
     const ID: ProcedureId = ProcedureId(0x000a_0003);
-    const NAME: &'static str = "frugalos.ctrl.stop";
+    const NAME: &'static str = "frugalos.ctrl.stop_node";
 
-    type Req = ();
+    type Req = RemoteNodeId;
     type ReqDecoder = BincodeDecoder<Self::Req>;
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
@@ -307,4 +308,3 @@ impl Call for StopNodeRpc {
     type ResDecoder = BincodeDecoder<Self::Res>;
     type ResEncoder = BincodeEncoder<Self::Res>;
 }
-
