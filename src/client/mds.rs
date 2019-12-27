@@ -27,6 +27,13 @@ impl Client {
         Client { node, rpc_service }
     }
 
+    /// `GetLeaderRpc`を実行する。
+    pub fn get_leader(&self) -> impl Future<Item = RemoteNodeId, Error = Error> {
+        Response(
+            mds::GetLeaderRpc::client(&self.rpc_service).call(self.node.0, self.node.1.clone()),
+        )
+    }
+
     /// `RecommendToLeaderRpc`を実行する。
     pub fn recommend_to_leader(&self) {
         let _ = mds::RecommendToLeaderRpc::client(&self.rpc_service)
