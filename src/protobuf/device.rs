@@ -1,78 +1,79 @@
 //! Device
 
+use bytecodec::combinator::PreEncode;
 use protobuf_codec::field::branch::Branch3;
 use protobuf_codec::field::num::{F1, F2, F3, F4, F5, F6};
 use protobuf_codec::field::{
     FieldDecoder, FieldEncoder, Fields, MaybeDefault, MessageFieldDecoder, MessageFieldEncoder,
-    Oneof, Optional, Repeated
+    Oneof, Optional, Repeated,
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
 use protobuf_codec::scalar::{
-    DoubleDecoder, DoubleEncoder, 
-    StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder,
+    DoubleDecoder, DoubleEncoder, StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder,
     Uint64Decoder, Uint64Encoder,
 };
 use std::collections::BTreeSet;
 use std::path::PathBuf;
 
 use entity::device::{
-    Device, DeviceKind, DeviceSummary, FileDevice, MemoryDevice, SegmentAllocationPolicy, VirtualDevice, Weight,
+    Device, DeviceKind, DeviceSummary, FileDevice, MemoryDevice, SegmentAllocationPolicy,
+    VirtualDevice, Weight,
 };
 //use ErrorKind;
 use Result;
 
-///// Decoder for `DeviceSummary`.
-//#[derive(Debug, Default)]
-//pub struct DeviceSummaryDecoder {
-//    inner: MessageDecoder<
-//        Fields<(
-//            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
-//            Optional<MaybeDefault<FieldDecoder<F2, StringDecoder>>>,
-//            MaybeDefault<FieldDecoder<F3, Uint32Decoder>>,
-//        )>,
-//    >,
-//}
-//
-//impl_message_decode!(DeviceSummaryDecoder, DeviceSummary, |t: (
-//    String,
-//    Option<String>,
-//    u32,
-//)| {
-//    let kind = match t.2 {
-//        0 => DeviceKind::Virtual,
-//        1 => DeviceKind::Memory,
-//        2 => DeviceKind::File,
-//        _n => DeviceKind::Memory,
-//        // TODO
-//        //n => track_panic!(ErrorKind::InvalidInput, "Unknown device kind: {}", n),
-//    };
-//    Ok(DeviceSummary {
-//        id: t.0.clone(),
-//        server: t.1.clone(),
-//        kind,
-//    })
-//});
-//
-///// Encoder for `DeviceSummary`.
-//#[derive(Debug, Default)]
-//pub struct DeviceSummaryEncoder {
-//    inner: MessageEncoder<
-//        Fields<(
-//            FieldEncoder<F1, StringEncoder>,
-//            Optional<FieldEncoder<F2, StringEncoder>>,
-//            FieldEncoder<F3, Uint32Encoder>,
-//        )>,
-//    >,
-//}
-//
-//impl_sized_message_encode!(DeviceSummaryEncoder, DeviceSummary, |item: Self::Item| {
-//    let kind = match item.kind {
-//        DeviceKind::Virtual => 0,
-//        DeviceKind::Memory => 1,
-//        DeviceKind::File => 2,
-//    };
-//    (item.id, item.server, kind)
-//});
+/// Decoder for `DeviceSummary`.
+#[derive(Debug, Default)]
+pub struct DeviceSummaryDecoder {
+    inner: MessageDecoder<
+        Fields<(
+            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
+            Optional<FieldDecoder<F2, StringDecoder>>,
+            MaybeDefault<FieldDecoder<F3, Uint32Decoder>>,
+        )>,
+    >,
+}
+
+impl_message_decode!(DeviceSummaryDecoder, DeviceSummary, |t: (
+    String,
+    Option<String>,
+    u32,
+)| {
+    let kind = match t.2 {
+        0 => DeviceKind::Virtual,
+        1 => DeviceKind::Memory,
+        2 => DeviceKind::File,
+        _n => DeviceKind::Memory,
+        // TODO
+        //n => track_panic!(ErrorKind::InvalidInput, "Unknown device kind: {}", n),
+    };
+    Ok(DeviceSummary {
+        id: t.0.clone(),
+        server: t.1.clone(),
+        kind,
+    })
+});
+
+/// Encoder for `DeviceSummary`.
+#[derive(Debug, Default)]
+pub struct DeviceSummaryEncoder {
+    inner: MessageEncoder<
+        Fields<(
+            FieldEncoder<F1, StringEncoder>,
+            Optional<FieldEncoder<F2, StringEncoder>>,
+            FieldEncoder<F3, Uint32Encoder>,
+        )>,
+    >,
+}
+
+impl_sized_message_encode!(DeviceSummaryEncoder, DeviceSummary, |item: Self::Item| {
+    let kind = match item.kind {
+        DeviceKind::Virtual => 0,
+        DeviceKind::Memory => 1,
+        DeviceKind::File => 2,
+    };
+    (item.id, item.server, kind)
+});
 
 /// Decoder for `Device`.
 #[derive(Debug, Default)]
@@ -99,7 +100,7 @@ impl_message_decode!(DeviceDecoder, Device, |t: _| {
 pub struct DeviceEncoder {
     inner: MessageEncoder<
         Oneof<(
-            MessageFieldEncoder<F1, VirtualDeviceEncoder>,
+            MessageFieldEncoder<F1, PreEncode<VirtualDeviceEncoder>>,
             MessageFieldEncoder<F2, MemoryDeviceEncoder>,
             MessageFieldEncoder<F3, FileDeviceEncoder>,
         )>,
@@ -273,14 +274,8 @@ pub struct MemoryDeviceEncoder {
     >,
 }
 
-impl_message_encode!(MemoryDeviceEncoder, MemoryDevice, |item: Self::Item| {
-    (
-        item.id,
-        item.seqno,
-        item.weight,
-        item.server,
-        item.capacity,
-    )
+impl_sized_message_encode!(MemoryDeviceEncoder, MemoryDevice, |item: Self::Item| {
+    (item.id, item.seqno, item.weight, item.server, item.capacity)
 });
 
 /// Decoder for `FileDevice`.
@@ -331,7 +326,7 @@ pub struct FileDeviceEncoder {
     >,
 }
 
-impl_message_encode!(FileDeviceEncoder, FileDevice, |item: Self::Item| {
+impl_sized_message_encode!(FileDeviceEncoder, FileDevice, |item: Self::Item| {
     // TODO
     let filepath = item.filepath.into_os_string().into_string().unwrap();
     (
