@@ -7,6 +7,7 @@ extern crate fibers;
 extern crate fibers_rpc;
 extern crate futures;
 extern crate libc;
+extern crate protobuf_codec;
 extern crate serde;
 
 #[macro_use]
@@ -22,6 +23,7 @@ pub mod deadline;
 pub mod entity;
 pub mod expect;
 pub mod multiplicity;
+pub mod protobuf;
 pub mod repair;
 pub mod schema;
 pub mod time;
