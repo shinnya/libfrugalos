@@ -7,9 +7,7 @@ use protobuf_codec::field::{
     Oneof,
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
-use protobuf_codec::scalar::{
-    BytesDecoder, BytesEncoder, StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder,
-};
+use protobuf_codec::scalar::{StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder};
 
 use entity::bucket::{
     Bucket, BucketKind, BucketSummary, DispersedBucket, MetadataBucket, ReplicatedBucket,
