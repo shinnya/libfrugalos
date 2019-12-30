@@ -21,12 +21,12 @@ use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::deadline::{decode_deadline, encode_deadline, DeadlineDecoder, DeadlineEncoder};
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use protobuf::object::{
-    ObjectIdDecoder, ObjectIdEncoder, ObjectRangeDecoder, ObjectRangeEncoder, ObjectVersionDecoder,
-    ObjectVersionEncoder, ObjectVersionsDecoder,
+    ObjectIdDecoder, ObjectIdEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
+    ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder, ObjectVersionsDecoder,
 };
 use schema::frugalos::{
-    CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, RangeRequest,
-    SegmentRequest, VersionRequest,
+    CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, PrefixRequest,
+    RangeRequest, SegmentRequest, VersionRequest,
 };
 
 /// Decoder for `ObjectRequest`.
@@ -288,6 +288,41 @@ impl_sized_message_encode!(RangeRequestEncoder, RangeRequest, |item: Self::Item|
         item.targets,
         encode_deadline(item.deadline),
     )
+});
+
+///// Decoder for `PrefixRequest`.
+#[derive(Debug)]
+pub struct PrefixRequestDecoder {
+    inner: MessageDecoder<
+        Fields<(
+            MaybeDefault<FieldDecoder<F1, BucketIdDecoder>>,
+            MessageFieldDecoder<F2, ObjectPrefixDecoder>,
+            MaybeDefault<FieldDecoder<F3, DeadlineDecoder>>,
+        )>,
+    >,
+}
+impl_message_decode!(PrefixRequestDecoder, PrefixRequest, |t: (String, _, _,)| {
+    let deadline = track!(decode_deadline(t.2))?;
+    Ok(PrefixRequest {
+        bucket_id: t.0.clone(),
+        prefix: t.1,
+        deadline,
+    })
+});
+
+/// Encoder for `PrefixRequest`.
+#[derive(Debug)]
+pub struct PrefixRequestEncoder {
+    inner: MessageEncoder<
+        Fields<(
+            FieldEncoder<F1, BucketIdEncoder>,
+            MessageFieldEncoder<F2, ObjectPrefixEncoder>,
+            FieldEncoder<F3, DeadlineEncoder>,
+        )>,
+    >,
+}
+impl_sized_message_encode!(PrefixRequestEncoder, PrefixRequest, |item: Self::Item| {
+    (item.bucket_id, item.prefix, encode_deadline(item.deadline))
 });
 
 /// Decoder for `ListObjectsRequestEncoder`.
