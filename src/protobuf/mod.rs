@@ -1,5 +1,4 @@
-//! hoge
-//!
+//! Encoders and decoders of Protocol Buffers.
 
 #[macro_use]
 mod macros;

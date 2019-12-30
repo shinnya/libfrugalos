@@ -12,7 +12,6 @@ use entity::object::{
     DeleteObjectsByPrefixSummary, FragmentsSummary, Metadata, ObjectPrefix, ObjectSummary,
     ObjectVersion,
 };
-//use ErrorKind;
 
 /// Decoder for `ObjectSummary`.
 #[derive(Debug, Default)]

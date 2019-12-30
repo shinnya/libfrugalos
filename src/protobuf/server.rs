@@ -8,7 +8,6 @@ use std::net::IpAddr;
 use std::str::FromStr;
 
 use entity::server::{Server, ServerSummary};
-//use ErrorKind;
 
 /// Decoder for `ServerSummary`.
 #[derive(Debug, Default)]
@@ -47,7 +46,7 @@ impl_message_decode!(ServerDecoder, Server, |t: (String, u32, String, u32)| {
     Ok(Server {
         id: t.0.clone(),
         seqno: t.1,
-        host: IpAddr::from_str(&t.2).unwrap(), // TODO
+        host: track_any_err!(IpAddr::from_str(&t.2))?,
         port: t.3 as u16,
     })
 });

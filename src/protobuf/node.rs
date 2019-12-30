@@ -22,8 +22,7 @@ pub struct RemoteNodeIdDecoder {
 }
 
 impl_message_decode!(RemoteNodeIdDecoder, RemoteNodeId, |t: (String, String,)| {
-    // TODO
-    let addr = SocketAddr::from_str(&t.0).unwrap();
+    let addr = track_any_err!(SocketAddr::from_str(&t.0))?;
     Ok((addr, t.1))
 });
 
