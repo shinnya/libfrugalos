@@ -14,6 +14,9 @@ use entity::bucket::{
     Bucket, BucketKind, BucketSummary, DispersedBucket, MetadataBucket, ReplicatedBucket,
 };
 
+pub type BucketIdDecoder = StringDecoder;
+pub type BucketIdEncoder = StringEncoder;
+
 /// Decoder for `BucketSummary`.
 #[derive(Debug, Default)]
 pub struct BucketSummaryDecoder {

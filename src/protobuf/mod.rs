@@ -1,7 +1,10 @@
 //! Encoders and decoders of Protocol Buffers.
 
-mod bucket;
-mod device;
-mod node;
-mod object;
-mod server;
+pub mod bucket;
+pub mod consistency;
+pub mod device;
+pub mod expect;
+pub mod node;
+pub mod object;
+pub mod schema;
+pub mod server;

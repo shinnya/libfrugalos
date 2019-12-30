@@ -7,6 +7,7 @@ extern crate fibers;
 extern crate fibers_rpc;
 extern crate futures;
 extern crate libc;
+#[macro_use]
 extern crate protobuf_codec;
 extern crate serde;
 
