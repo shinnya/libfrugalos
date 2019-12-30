@@ -1,6 +1,7 @@
 //! Device
 
 use bytecodec::combinator::PreEncode;
+use bytecodec::{ErrorKind, Result};
 use protobuf_codec::field::branch::Branch3;
 use protobuf_codec::field::num::{F1, F2, F3, F4, F5, F6};
 use protobuf_codec::field::{
@@ -12,15 +13,15 @@ use protobuf_codec::scalar::{
     DoubleDecoder, DoubleEncoder, StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder,
     Uint64Decoder, Uint64Encoder,
 };
+use std::borrow::ToOwned;
 use std::collections::BTreeSet;
 use std::path::PathBuf;
+use trackable::error::ErrorKindExt;
 
 use entity::device::{
     Device, DeviceKind, DeviceSummary, FileDevice, MemoryDevice, SegmentAllocationPolicy,
     VirtualDevice, Weight,
 };
-//use ErrorKind;
-use Result;
 
 /// Decoder for `DeviceSummary`.
 #[derive(Debug, Default)]
@@ -39,18 +40,15 @@ impl_message_decode!(DeviceSummaryDecoder, DeviceSummary, |t: (
     Option<String>,
     u32,
 )| {
-    let kind = match t.2 {
-        0 => DeviceKind::Virtual,
-        1 => DeviceKind::Memory,
-        2 => DeviceKind::File,
-        _n => DeviceKind::Memory,
-        // TODO
-        //n => track_panic!(ErrorKind::InvalidInput, "Unknown device kind: {}", n),
-    };
     Ok(DeviceSummary {
         id: t.0.clone(),
         server: t.1.clone(),
-        kind,
+        kind: match t.2 {
+            0 => DeviceKind::Virtual,
+            1 => DeviceKind::Memory,
+            2 => DeviceKind::File,
+            n => track_panic!(ErrorKind::InvalidInput, "Unknown device kind: {}", n),
+        },
     })
 });
 
@@ -152,15 +150,18 @@ impl_sized_message_encode!(WeightEncoder, Weight, |item: Self::Item| match item 
 });
 
 fn decode_segment_allocation_policy(x: u32) -> Result<SegmentAllocationPolicy> {
-    match x {
-        0 => Ok(SegmentAllocationPolicy::ScatterIfPossible),
-        1 => Ok(SegmentAllocationPolicy::Scatter),
-        2 => Ok(SegmentAllocationPolicy::Neutral),
-        3 => Ok(SegmentAllocationPolicy::Gather),
-        4 => Ok(SegmentAllocationPolicy::AsEvenAsPossible),
-        // TODO
-        _n => Ok(SegmentAllocationPolicy::ScatterIfPossible),
-    }
+    Ok(match x {
+        0 => SegmentAllocationPolicy::ScatterIfPossible,
+        1 => SegmentAllocationPolicy::Scatter,
+        2 => SegmentAllocationPolicy::Neutral,
+        3 => SegmentAllocationPolicy::Gather,
+        4 => SegmentAllocationPolicy::AsEvenAsPossible,
+        n => track_panic!(
+            ErrorKind::InvalidInput,
+            "Unknown SegmentAllocationPolicy: {}",
+            n
+        ),
+    })
 }
 
 fn encode_segment_allocation_policy(policy: SegmentAllocationPolicy) -> u32 {
@@ -194,9 +195,7 @@ impl_message_decode!(VirtualDeviceDecoder, VirtualDevice, |t: (
     Vec<_>,
     u32,
 )| {
-    // TODO
-    //let policy = track!(decode_segment_allocation_policy(t.4))?;
-    let policy = decode_segment_allocation_policy(t.4).unwrap();
+    let policy = track!(decode_segment_allocation_policy(t.4))?;
     Ok(VirtualDevice {
         id: t.0.clone(),
         seqno: t.1,
@@ -288,6 +287,7 @@ pub struct FileDeviceDecoder {
             MaybeDefault<MessageFieldDecoder<F3, WeightDecoder>>,
             MaybeDefault<FieldDecoder<F4, StringDecoder>>,
             MaybeDefault<FieldDecoder<F5, Uint64Decoder>>,
+            // パスは valid な UTF-8 に制限してしまう
             MaybeDefault<FieldDecoder<F6, StringDecoder>>,
         )>,
     >,
@@ -325,16 +325,41 @@ pub struct FileDeviceEncoder {
         )>,
     >,
 }
+// `FileDeviceEncoder` はバリデーションが必要なのでマクロを使わずに実装する
+impl ::bytecodec::Encode for FileDeviceEncoder {
+    type Item = FileDevice;
 
-impl_sized_message_encode!(FileDeviceEncoder, FileDevice, |item: Self::Item| {
-    // TODO
-    let filepath = item.filepath.into_os_string().into_string().unwrap();
-    (
-        item.id,
-        item.seqno,
-        item.weight,
-        item.server,
-        item.capacity,
-        filepath,
-    )
-});
+    fn encode(&mut self, buf: &mut [u8], eos: ::bytecodec::Eos) -> ::bytecodec::Result<usize> {
+        track!(self.inner.encode(buf, eos))
+    }
+
+    fn start_encoding(&mut self, item: Self::Item) -> ::bytecodec::Result<()> {
+        let filepath = track!(item
+            .filepath
+            .to_str()
+            .map(ToOwned::to_owned)
+            .ok_or(ErrorKind::InvalidInput.cause("filepath is not a valid UTF-8")))?;
+        track!(self.inner.start_encoding((
+            item.id,
+            item.seqno,
+            item.weight,
+            item.server,
+            item.capacity,
+            filepath,
+        )))
+    }
+
+    fn is_idle(&self) -> bool {
+        self.inner.is_idle()
+    }
+
+    fn requiring_bytes(&self) -> ::bytecodec::ByteCount {
+        self.inner.requiring_bytes()
+    }
+}
+impl ::protobuf_codec::message::MessageEncode for FileDeviceEncoder {}
+impl ::bytecodec::SizedEncode for FileDeviceEncoder {
+    fn exact_requiring_bytes(&self) -> u64 {
+        self.inner.exact_requiring_bytes()
+    }
+}
