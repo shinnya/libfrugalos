@@ -1,27 +1,24 @@
 //! test
 
 use bytecodec::combinator::PreEncode;
-use protobuf_codec::field::branch::Branch3;
 use protobuf_codec::field::num::{F1, F2, F3, F4, F5, F6};
 use protobuf_codec::field::{
     FieldDecoder, FieldEncoder, Fields, MaybeDefault, MessageFieldDecoder, MessageFieldEncoder,
-    Oneof, Optional,
+    Optional,
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
 use protobuf_codec::scalar::{
     BoolDecoder, BoolEncoder, BytesDecoder, BytesEncoder, StringDecoder, StringEncoder,
-    Uint32Decoder, Uint32Encoder, Uint64Decoder, Uint64Encoder,
+    Uint32Decoder, Uint32Encoder,
 };
 
-use consistency::ReadConsistency;
 use entity::object::ObjectVersion;
-use expect::Expect;
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::deadline::{decode_deadline, encode_deadline, DeadlineDecoder, DeadlineEncoder};
 use protobuf::entity::bucket::{BucketIdDecoder, BucketIdEncoder};
 use protobuf::entity::object::{
     ObjectIdDecoder, ObjectIdEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
-    ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder, ObjectVersionsDecoder,
+    ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder,
 };
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use schema::frugalos::{
@@ -247,7 +244,7 @@ impl_sized_message_encode!(VersionRequestEncoder, VersionRequest, |item: Self::I
     )
 });
 
-///// Decoder for `RangeRequest`.
+/// Decoder for `RangeRequest`.
 #[derive(Debug, Default)]
 pub struct RangeRequestDecoder {
     inner: MessageDecoder<
@@ -290,7 +287,7 @@ impl_sized_message_encode!(RangeRequestEncoder, RangeRequest, |item: Self::Item|
     )
 });
 
-///// Decoder for `PrefixRequest`.
+/// Decoder for `PrefixRequest`.
 #[derive(Debug, Default)]
 pub struct PrefixRequestDecoder {
     inner: MessageDecoder<

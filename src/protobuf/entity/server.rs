@@ -7,12 +7,18 @@ use protobuf_codec::scalar::{StringDecoder, StringEncoder, Uint32Decoder, Uint32
 use std::net::IpAddr;
 use std::str::FromStr;
 
-use entity::server::{Server, ServerSummary};
+use entity::server::{Server, ServerId, ServerSummary};
+
+/// Decoder for `ServerId`.
+pub type ServerIdDecoder = StringDecoder;
+
+/// Encoder for `ServerId`.
+pub type ServerIdEncoder = StringEncoder;
 
 /// Decoder for `ServerSummary`.
 #[derive(Debug, Default)]
 pub struct ServerSummaryDecoder {
-    inner: MessageDecoder<MaybeDefault<FieldDecoder<F1, StringDecoder>>>,
+    inner: MessageDecoder<MaybeDefault<FieldDecoder<F1, ServerIdDecoder>>>,
 }
 
 impl_message_decode!(ServerSummaryDecoder, ServerSummary, |t: _| {
@@ -22,7 +28,7 @@ impl_message_decode!(ServerSummaryDecoder, ServerSummary, |t: _| {
 /// Encoder for `ServerSummary`.
 #[derive(Debug, Default)]
 pub struct ServerSummaryEncoder {
-    inner: MessageEncoder<FieldEncoder<F1, StringEncoder>>,
+    inner: MessageEncoder<FieldEncoder<F1, ServerIdEncoder>>,
 }
 
 impl_sized_message_encode!(ServerSummaryEncoder, ServerSummary, |item: Self::Item| {
@@ -34,7 +40,7 @@ impl_sized_message_encode!(ServerSummaryEncoder, ServerSummary, |item: Self::Ite
 pub struct ServerDecoder {
     inner: MessageDecoder<
         Fields<(
-            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
+            MaybeDefault<FieldDecoder<F1, ServerIdDecoder>>,
             MaybeDefault<FieldDecoder<F2, Uint32Decoder>>,
             MaybeDefault<FieldDecoder<F3, StringDecoder>>,
             MaybeDefault<FieldDecoder<F4, Uint32Decoder>>,
@@ -42,7 +48,7 @@ pub struct ServerDecoder {
     >,
 }
 
-impl_message_decode!(ServerDecoder, Server, |t: (String, u32, String, u32)| {
+impl_message_decode!(ServerDecoder, Server, |t: (ServerId, u32, String, u32)| {
     Ok(Server {
         id: t.0.clone(),
         seqno: t.1,
@@ -56,7 +62,7 @@ impl_message_decode!(ServerDecoder, Server, |t: (String, u32, String, u32)| {
 pub struct ServerEncoder {
     inner: MessageEncoder<
         Fields<(
-            FieldEncoder<F1, StringEncoder>,
+            FieldEncoder<F1, ServerIdEncoder>,
             FieldEncoder<F2, Uint32Encoder>,
             FieldEncoder<F3, StringEncoder>,
             FieldEncoder<F4, Uint32Encoder>,

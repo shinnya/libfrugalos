@@ -19,16 +19,22 @@ use std::path::PathBuf;
 use trackable::error::ErrorKindExt;
 
 use entity::device::{
-    Device, DeviceKind, DeviceSummary, FileDevice, MemoryDevice, SegmentAllocationPolicy,
+    Device, DeviceId, DeviceKind, DeviceSummary, FileDevice, MemoryDevice, SegmentAllocationPolicy,
     VirtualDevice, Weight,
 };
+
+/// Decoder for `DeviceId`.
+pub type DeviceIdDecoder = StringDecoder;
+
+/// Encoder for `DeviceId`.
+pub type DeviceIdEncoder = StringEncoder;
 
 /// Decoder for `DeviceSummary`.
 #[derive(Debug, Default)]
 pub struct DeviceSummaryDecoder {
     inner: MessageDecoder<
         Fields<(
-            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
+            MaybeDefault<FieldDecoder<F1, DeviceIdDecoder>>,
             Optional<FieldDecoder<F2, StringDecoder>>,
             MaybeDefault<FieldDecoder<F3, Uint32Decoder>>,
         )>,
@@ -36,7 +42,7 @@ pub struct DeviceSummaryDecoder {
 }
 
 impl_message_decode!(DeviceSummaryDecoder, DeviceSummary, |t: (
-    String,
+    DeviceId,
     Option<String>,
     u32,
 )| {
@@ -57,7 +63,7 @@ impl_message_decode!(DeviceSummaryDecoder, DeviceSummary, |t: (
 pub struct DeviceSummaryEncoder {
     inner: MessageEncoder<
         Fields<(
-            FieldEncoder<F1, StringEncoder>,
+            FieldEncoder<F1, DeviceIdEncoder>,
             Optional<FieldEncoder<F2, StringEncoder>>,
             FieldEncoder<F3, Uint32Encoder>,
         )>,
@@ -179,7 +185,7 @@ fn encode_segment_allocation_policy(policy: SegmentAllocationPolicy) -> u32 {
 pub struct VirtualDeviceDecoder {
     inner: MessageDecoder<
         Fields<(
-            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
+            MaybeDefault<FieldDecoder<F1, DeviceIdDecoder>>,
             MaybeDefault<FieldDecoder<F2, Uint32Decoder>>,
             MaybeDefault<MessageFieldDecoder<F3, WeightDecoder>>,
             Repeated<FieldDecoder<F4, StringDecoder>, Vec<String>>,
@@ -210,7 +216,7 @@ impl_message_decode!(VirtualDeviceDecoder, VirtualDevice, |t: (
 pub struct VirtualDeviceEncoder {
     inner: MessageEncoder<
         Fields<(
-            FieldEncoder<F1, StringEncoder>,
+            FieldEncoder<F1, DeviceIdEncoder>,
             FieldEncoder<F2, Uint32Encoder>,
             MessageFieldEncoder<F3, WeightEncoder>,
             Repeated<FieldEncoder<F4, StringEncoder>, Vec<String>>,
@@ -234,7 +240,7 @@ impl_message_encode!(VirtualDeviceEncoder, VirtualDevice, |item: Self::Item| {
 pub struct MemoryDeviceDecoder {
     inner: MessageDecoder<
         Fields<(
-            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
+            MaybeDefault<FieldDecoder<F1, DeviceIdDecoder>>,
             MaybeDefault<FieldDecoder<F2, Uint32Decoder>>,
             MaybeDefault<MessageFieldDecoder<F3, WeightDecoder>>,
             MaybeDefault<FieldDecoder<F4, StringDecoder>>,
@@ -244,7 +250,7 @@ pub struct MemoryDeviceDecoder {
 }
 
 impl_message_decode!(MemoryDeviceDecoder, MemoryDevice, |t: (
-    String,
+    DeviceId,
     u32,
     Weight,
     String,
@@ -264,7 +270,7 @@ impl_message_decode!(MemoryDeviceDecoder, MemoryDevice, |t: (
 pub struct MemoryDeviceEncoder {
     inner: MessageEncoder<
         Fields<(
-            FieldEncoder<F1, StringEncoder>,
+            FieldEncoder<F1, DeviceIdEncoder>,
             FieldEncoder<F2, Uint32Encoder>,
             MessageFieldEncoder<F3, WeightEncoder>,
             FieldEncoder<F4, StringEncoder>,
@@ -282,7 +288,7 @@ impl_sized_message_encode!(MemoryDeviceEncoder, MemoryDevice, |item: Self::Item|
 pub struct FileDeviceDecoder {
     inner: MessageDecoder<
         Fields<(
-            MaybeDefault<FieldDecoder<F1, StringDecoder>>,
+            MaybeDefault<FieldDecoder<F1, DeviceIdDecoder>>,
             MaybeDefault<FieldDecoder<F2, Uint32Decoder>>,
             MaybeDefault<MessageFieldDecoder<F3, WeightDecoder>>,
             MaybeDefault<FieldDecoder<F4, StringDecoder>>,
@@ -294,7 +300,7 @@ pub struct FileDeviceDecoder {
 }
 
 impl_message_decode!(FileDeviceDecoder, FileDevice, |t: (
-    String,
+    DeviceId,
     u32,
     Weight,
     String,
@@ -316,7 +322,7 @@ impl_message_decode!(FileDeviceDecoder, FileDevice, |t: (
 pub struct FileDeviceEncoder {
     inner: MessageEncoder<
         Fields<(
-            FieldEncoder<F1, StringEncoder>,
+            FieldEncoder<F1, DeviceIdEncoder>,
             FieldEncoder<F2, Uint32Encoder>,
             MessageFieldEncoder<F3, WeightEncoder>,
             FieldEncoder<F4, StringEncoder>,

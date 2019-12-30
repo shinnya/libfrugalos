@@ -14,7 +14,10 @@ use entity::bucket::{
     Bucket, BucketKind, BucketSummary, DispersedBucket, MetadataBucket, ReplicatedBucket,
 };
 
+/// Decoder for `BucketId`.
 pub type BucketIdDecoder = StringDecoder;
+
+/// Encoder for `BucketId`.
 pub type BucketIdEncoder = StringEncoder;
 
 /// Decoder for `BucketSummary`.

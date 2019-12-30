@@ -4,11 +4,10 @@ use bytecodec::combinator::PreEncode;
 use protobuf_codec::field::branch::Branch4;
 use protobuf_codec::field::num::{F1, F2, F3, F4};
 use protobuf_codec::field::{
-    FieldDecoder, FieldEncoder, Fields, MessageFieldDecoder, MessageFieldEncoder, Oneof,
-    PackedFieldDecoder, PackedFieldEncoder, Repeated,
+    FieldDecoder, FieldEncoder, MessageFieldDecoder, MessageFieldEncoder, Oneof,
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
-use protobuf_codec::scalar::{Uint32Decoder, Uint32Encoder, Uint64Decoder, Uint64Encoder};
+use protobuf_codec::scalar::{Uint32Decoder, Uint32Encoder};
 
 use entity::object::ObjectVersion;
 use expect::Expect;

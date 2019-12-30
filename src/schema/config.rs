@@ -6,6 +6,10 @@ use std::net::SocketAddr;
 use entity::bucket::{Bucket, BucketId, BucketSummary};
 use entity::device::{Device, DeviceId, DeviceSummary};
 use entity::server::{Server, ServerId, ServerSummary};
+use protobuf::entity::bucket::{BucketDecoder, BucketEncoder, BucketIdDecoder, BucketIdEncoder};
+use protobuf::entity::device::{DeviceDecoder, DeviceEncoder, DeviceIdDecoder, DeviceIdEncoder};
+use protobuf::entity::server::{ServerDecoder, ServerEncoder, ServerIdDecoder, ServerIdEncoder};
+use protobuf::{UnitDecoder, UnitEncoder};
 use Result;
 
 /// サーバ一覧取得RPC。
@@ -16,8 +20,8 @@ impl Call for ListServersRpc {
     const NAME: &'static str = "frugalos.config.server.list";
 
     type Req = ();
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = UnitDecoder;
+    type ReqEncoder = UnitEncoder;
 
     type Res = Result<Vec<ServerSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -32,8 +36,8 @@ impl Call for GetServerRpc {
     const NAME: &'static str = "frugalos.config.server.get";
 
     type Req = ServerId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = ServerIdDecoder;
+    type ReqEncoder = ServerIdEncoder;
 
     type Res = Result<Option<Server>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -48,8 +52,8 @@ impl Call for PutServerRpc {
     const NAME: &'static str = "frugalos.config.server.put";
 
     type Req = Server;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = ServerDecoder;
+    type ReqEncoder = ServerEncoder;
 
     type Res = Result<Server>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -64,8 +68,8 @@ impl Call for DeleteServerRpc {
     const NAME: &'static str = "frugalos.config.server.delete";
 
     type Req = ServerId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = ServerIdDecoder;
+    type ReqEncoder = ServerIdEncoder;
 
     type Res = Result<Option<Server>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -80,8 +84,8 @@ impl Call for ListDevicesRpc {
     const NAME: &'static str = "frugalos.config.device.list";
 
     type Req = ();
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = UnitDecoder;
+    type ReqEncoder = UnitEncoder;
 
     type Res = Result<Vec<DeviceSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -96,8 +100,8 @@ impl Call for GetDeviceRpc {
     const NAME: &'static str = "frugalos.config.device.get";
 
     type Req = DeviceId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = DeviceIdDecoder;
+    type ReqEncoder = DeviceIdEncoder;
 
     type Res = Result<Option<Device>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -112,8 +116,8 @@ impl Call for PutDeviceRpc {
     const NAME: &'static str = "frugalos.config.device.put";
 
     type Req = Device;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = DeviceDecoder;
+    type ReqEncoder = DeviceEncoder;
 
     type Res = Result<Device>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -128,8 +132,8 @@ impl Call for DeleteDeviceRpc {
     const NAME: &'static str = "frugalos.config.device.delete";
 
     type Req = DeviceId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = DeviceIdDecoder;
+    type ReqEncoder = DeviceIdEncoder;
 
     type Res = Result<Option<Device>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -144,8 +148,8 @@ impl Call for ListBucketsRpc {
     const NAME: &'static str = "frugalos.config.bucket.list";
 
     type Req = ();
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = UnitDecoder;
+    type ReqEncoder = UnitEncoder;
 
     type Res = Result<Vec<BucketSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -160,8 +164,8 @@ impl Call for GetBucketRpc {
     const NAME: &'static str = "frugalos.config.bucket.get";
 
     type Req = BucketId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = BucketIdDecoder;
+    type ReqEncoder = BucketIdEncoder;
 
     type Res = Result<Option<Bucket>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -176,8 +180,8 @@ impl Call for PutBucketRpc {
     const NAME: &'static str = "frugalos.config.bucket.put";
 
     type Req = Bucket;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = BucketDecoder;
+    type ReqEncoder = BucketEncoder;
 
     type Res = Result<Bucket>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -192,8 +196,8 @@ impl Call for DeleteBucketRpc {
     const NAME: &'static str = "frugalos.config.bucket.delete";
 
     type Req = BucketId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = BucketIdDecoder;
+    type ReqEncoder = BucketIdEncoder;
 
     type Res = Result<Option<Bucket>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -209,8 +213,8 @@ impl Call for GetLeaderRpc {
     const NAME: &'static str = "frugalos.config.leader.get";
 
     type Req = ();
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = UnitDecoder;
+    type ReqEncoder = UnitEncoder;
 
     type Res = Result<SocketAddr>;
     type ResDecoder = BincodeDecoder<Self::Res>;
