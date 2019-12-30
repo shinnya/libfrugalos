@@ -22,6 +22,8 @@ pub mod consistency;
 pub mod deadline;
 pub mod entity;
 pub mod expect;
+#[macro_use]
+mod macros;
 pub mod multiplicity;
 pub mod protobuf;
 pub mod repair;

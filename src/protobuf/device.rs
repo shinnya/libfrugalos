@@ -349,12 +349,12 @@ impl ::bytecodec::Encode for FileDeviceEncoder {
         )))
     }
 
-    fn is_idle(&self) -> bool {
-        self.inner.is_idle()
-    }
-
     fn requiring_bytes(&self) -> ::bytecodec::ByteCount {
         self.inner.requiring_bytes()
+    }
+
+    fn is_idle(&self) -> bool {
+        self.inner.is_idle()
     }
 }
 impl ::protobuf_codec::message::MessageEncode for FileDeviceEncoder {}
