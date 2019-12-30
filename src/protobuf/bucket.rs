@@ -1,5 +1,6 @@
 //! aaa
 
+use bytecodec::ErrorKind;
 use protobuf_codec::field::branch::Branch3;
 use protobuf_codec::field::num::{F1, F2, F3, F4, F5, F6};
 use protobuf_codec::field::{
@@ -12,7 +13,6 @@ use protobuf_codec::scalar::{StringDecoder, StringEncoder, Uint32Decoder, Uint32
 use entity::bucket::{
     Bucket, BucketKind, BucketSummary, DispersedBucket, MetadataBucket, ReplicatedBucket,
 };
-//use ErrorKind;
 
 /// Decoder for `BucketSummary`.
 #[derive(Debug, Default)]
@@ -31,17 +31,14 @@ impl_message_decode!(BucketSummaryDecoder, BucketSummary, |t: (
     u32,
     String,
 )| {
-    let kind = match t.1 {
-        0 => BucketKind::Metadata,
-        1 => BucketKind::Replicated,
-        2 => BucketKind::Dispersed,
-        _n => BucketKind::Metadata,
-        // TODO
-        //n => track_panic!(ErrorKind::InvalidInput, "Unknown bucket kind: {}", n),
-    };
     Ok(BucketSummary {
         id: t.0.clone(),
-        kind,
+        kind: match t.1 {
+            0 => BucketKind::Metadata,
+            1 => BucketKind::Replicated,
+            2 => BucketKind::Dispersed,
+            n => track_panic!(ErrorKind::InvalidInput, "Unknown bucket kind: {}", n),
+        },
         device: t.2.clone(),
     })
 });
