@@ -30,7 +30,7 @@ use schema::frugalos::{
 };
 
 /// Decoder for `ObjectRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ObjectRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -60,7 +60,7 @@ impl_message_decode!(ObjectRequestDecoder, ObjectRequest, |t: (
 });
 
 /// Encoder for `ObjectRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ObjectRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -83,7 +83,7 @@ impl_sized_message_encode!(ObjectRequestEncoder, ObjectRequest, |item: Self::Ite
 });
 
 /// Decoder for `CountFragmentsRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CountFragmentsRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -111,7 +111,7 @@ impl_message_decode!(
 );
 
 /// Encoder for `CountFragmentsRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct CountFragmentsRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -138,7 +138,7 @@ impl_sized_message_encode!(
 );
 
 /// Decoder for `HeadObjectRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct HeadObjectRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -171,7 +171,7 @@ impl_message_decode!(HeadObjectRequestDecoder, HeadObjectRequest, |t: (
 });
 
 /// Encoder for `HeadObjectRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct HeadObjectRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -200,7 +200,7 @@ impl_sized_message_encode!(
 );
 
 /// Decoder for `VersionRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct VersionRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -227,7 +227,7 @@ impl_message_decode!(VersionRequestDecoder, VersionRequest, |t: (
 });
 
 /// Encoder for `VersionRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct VersionRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -248,7 +248,7 @@ impl_sized_message_encode!(VersionRequestEncoder, VersionRequest, |item: Self::I
 });
 
 ///// Decoder for `RangeRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RangeRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -270,7 +270,7 @@ impl_message_decode!(RangeRequestDecoder, RangeRequest, |t: (String, _, _, _,)| 
 });
 
 /// Encoder for `RangeRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct RangeRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -291,7 +291,7 @@ impl_sized_message_encode!(RangeRequestEncoder, RangeRequest, |item: Self::Item|
 });
 
 ///// Decoder for `PrefixRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PrefixRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -311,7 +311,7 @@ impl_message_decode!(PrefixRequestDecoder, PrefixRequest, |t: (String, _, _,)| {
 });
 
 /// Encoder for `PrefixRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PrefixRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -326,7 +326,7 @@ impl_sized_message_encode!(PrefixRequestEncoder, PrefixRequest, |item: Self::Ite
 });
 
 /// Decoder for `PutObjectRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PutObjectRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -359,7 +359,7 @@ impl_message_decode!(PutObjectRequestDecoder, PutObjectRequest, |t: (
 });
 
 /// Encoder for `PutObjectRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct PutObjectRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -388,7 +388,7 @@ impl_sized_message_encode!(
 );
 
 /// Decoder for `ListObjectsRequestEncoder`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ListObjectsRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -411,7 +411,7 @@ impl_message_decode!(ListObjectsRequestDecoder, ListObjectsRequest, |t: (
 });
 
 /// Encoder for `ListObjectsRequestEncoder`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct ListObjectsRequestEncoder {
     inner: MessageEncoder<
         Fields<(
@@ -427,7 +427,7 @@ impl_sized_message_encode!(
 );
 
 /// Decoder for `SegmentRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SegmentRequestDecoder {
     inner: MessageDecoder<
         Fields<(
@@ -444,7 +444,7 @@ impl_message_decode!(SegmentRequestDecoder, SegmentRequest, |t: (String, u32)| {
 });
 
 /// Encoder for `SegmentRequest`.
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SegmentRequestEncoder {
     inner: MessageEncoder<
         Fields<(

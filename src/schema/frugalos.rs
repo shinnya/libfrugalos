@@ -14,6 +14,7 @@ use entity::object::{
 };
 use expect::Expect;
 use multiplicity::MultiplicityConfig;
+use protobuf::schema::frugalos::{ObjectRequestDecoder, ObjectRequestEncoder, HeadObjectRequestDecoder, HeadObjectRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder, SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder, RangeRequestDecoder, RangeRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder, CountFragmentsRequestDecoder, CountFragmentsRequestEncoder};
 use repair::RepairConfig;
 use Result;
 
@@ -25,8 +26,8 @@ impl Call for GetObjectRpc {
     const NAME: &'static str = "frugalos.object.get";
 
     type Req = ObjectRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = ObjectRequestDecoder;
+    type ReqEncoder = ObjectRequestEncoder;
 
     // FIXME: データが巨大になる可能性があるのでbincodeはやめる
     type Res = Result<Option<(ObjectVersion, Vec<u8>)>>;
@@ -42,8 +43,8 @@ impl Call for HeadObjectRpc {
     const NAME: &'static str = "frugalos.object.head";
 
     type Req = HeadObjectRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = HeadObjectRequestDecoder;
+    type ReqEncoder = HeadObjectRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -59,8 +60,8 @@ impl Call for PutObjectRpc {
 
     // FIXME: データが巨大になる可能性があるのでbincodeはやめる
     type Req = PutObjectRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = PutObjectRequestDecoder;
+    type ReqEncoder = PutObjectRequestEncoder;
 
     type Res = Result<(ObjectVersion, bool)>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -75,8 +76,8 @@ impl Call for DeleteObjectRpc {
     const NAME: &'static str = "frugalos.object.delete";
 
     type Req = ObjectRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = ObjectRequestDecoder;
+    type ReqEncoder = ObjectRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -91,8 +92,8 @@ impl Call for ListObjectsRpc {
     const NAME: &'static str = "frugalos.object.list";
 
     type Req = ListObjectsRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = ListObjectsRequestDecoder;
+    type ReqEncoder = ListObjectsRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -111,8 +112,8 @@ impl Call for GetLatestVersionRpc {
     const NAME: &'static str = "frugalos.object.latest_version";
 
     type Req = SegmentRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = SegmentRequestDecoder;
+    type ReqEncoder = SegmentRequestEncoder;
 
     type Res = Result<Option<ObjectSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -127,8 +128,8 @@ impl Call for DeleteObjectByVersionRpc {
     const NAME: &'static str = "frugalos.object.delete_by_version";
 
     type Req = VersionRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = VersionRequestDecoder;
+    type ReqEncoder = VersionRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -143,8 +144,8 @@ impl Call for DeleteObjectsByRangeRpc {
     const NAME: &'static str = "frugalos.object.delete_by_range";
 
     type Req = RangeRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = RangeRequestDecoder;
+    type ReqEncoder = RangeRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -169,8 +170,8 @@ impl Call for DeleteObjectsByPrefixRpc {
     const NAME: &'static str = "frugalos.object.delete_by_prefix";
 
     type Req = PrefixRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = PrefixRequestDecoder;
+    type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<DeleteObjectsByPrefixSummary>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -201,8 +202,8 @@ impl Call for ListObjectsByPrefixRpc {
     const NAME: &'static str = "frugalos.object.list_by_prefix";
 
     type Req = PrefixRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = PrefixRequestDecoder;
+    type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -221,8 +222,8 @@ impl Call for CountFragmentsRpc {
     const NAME: &'static str = "frugalos.object.count_fragments";
 
     type Req = CountFragmentsRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = CountFragmentsRequestDecoder;
+    type ReqEncoder = CountFragmentsRequestEncoder;
 
     type Res = Result<Option<FragmentsSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
