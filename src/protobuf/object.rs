@@ -15,6 +15,18 @@ use entity::object::{
     ObjectVersion,
 };
 
+/// Decoder for `ObjectId`.
+pub type ObjectIdDecoder = StringDecoder;
+
+/// Encoder for `ObjectId`.
+pub type ObjectIdEncoder = StringEncoder;
+
+/// Decoder for `ObjectVersion`.
+pub type ObjectVersionDecoder = Uint64Decoder;
+
+/// Encoder for `ObjectVersion`.
+pub type ObjectVersionEncoder = Uint64Encoder;
+
 /// Decoder for `ObjectVersion`s.
 // 互換性に注意
 // https://github.com/frugalos/frugalos/blob/346b56c23a0055f160da385668ce163ee8ff6e60/frugalos_mds/src/protobuf.rs#L185
