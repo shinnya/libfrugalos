@@ -9,8 +9,8 @@ use protobuf_codec::field::{
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
 use protobuf_codec::scalar::{
-    BoolDecoder, BoolEncoder, StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder,
-    Uint64Decoder, Uint64Encoder,
+    BoolDecoder, BoolEncoder, BytesDecoder, BytesEncoder, StringDecoder, StringEncoder,
+    Uint32Decoder, Uint32Encoder, Uint64Decoder, Uint64Encoder,
 };
 
 use consistency::ReadConsistency;
@@ -26,7 +26,7 @@ use protobuf::object::{
 };
 use schema::frugalos::{
     CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, PrefixRequest,
-    RangeRequest, SegmentRequest, VersionRequest,
+    PutObjectRequest, RangeRequest, SegmentRequest, VersionRequest,
 };
 
 /// Decoder for `ObjectRequest`.
@@ -324,6 +324,68 @@ pub struct PrefixRequestEncoder {
 impl_sized_message_encode!(PrefixRequestEncoder, PrefixRequest, |item: Self::Item| {
     (item.bucket_id, item.prefix, encode_deadline(item.deadline))
 });
+
+/// Decoder for `PutObjectRequest`.
+#[derive(Debug)]
+pub struct PutObjectRequestDecoder {
+    inner: MessageDecoder<
+        Fields<(
+            MaybeDefault<FieldDecoder<F1, BucketIdDecoder>>,
+            MaybeDefault<FieldDecoder<F2, ObjectIdDecoder>>,
+            MaybeDefault<FieldDecoder<F3, BytesDecoder>>,
+            MaybeDefault<FieldDecoder<F4, DeadlineDecoder>>,
+            MessageFieldDecoder<F5, ExpectDecoder>,
+            FieldDecoder<F6, Uint32Decoder>, // TODO
+        )>,
+    >,
+}
+impl_message_decode!(PutObjectRequestDecoder, PutObjectRequest, |t: (
+    String,
+    String,
+    _,
+    _,
+    _,
+    _,
+)| {
+    let deadline = track!(decode_deadline(t.3))?;
+    Ok(PutObjectRequest {
+        bucket_id: t.0.clone(),
+        object_id: t.1.clone(),
+        content: t.2,
+        deadline,
+        expect: t.4,
+        multiplicity_config: Default::default(), // TODO
+    })
+});
+
+/// Encoder for `PutObjectRequest`.
+#[derive(Debug)]
+pub struct PutObjectRequestEncoder {
+    inner: MessageEncoder<
+        Fields<(
+            FieldEncoder<F1, BucketIdEncoder>,
+            FieldEncoder<F2, ObjectIdEncoder>,
+            FieldEncoder<F3, BytesEncoder>,
+            FieldEncoder<F4, DeadlineEncoder>,
+            MessageFieldEncoder<F5, PreEncode<ExpectEncoder>>,
+            FieldEncoder<F6, Uint32Encoder>, // TODO
+        )>,
+    >,
+}
+impl_sized_message_encode!(
+    PutObjectRequestEncoder,
+    PutObjectRequest,
+    |item: Self::Item| {
+        (
+            item.bucket_id,
+            item.object_id,
+            item.content,
+            encode_deadline(item.deadline),
+            item.expect,
+            Default::default(), // TODO
+        )
+    }
+);
 
 /// Decoder for `ListObjectsRequestEncoder`.
 #[derive(Debug)]
