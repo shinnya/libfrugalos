@@ -4,15 +4,14 @@ use bytecodec::combinator::PreEncode;
 use protobuf_codec::field::branch::Branch4;
 use protobuf_codec::field::num::{F1, F2, F3, F4};
 use protobuf_codec::field::{
-    FieldDecoder, FieldEncoder, Fields, Oneof,
-    MessageFieldDecoder, MessageFieldEncoder,
-    PackedFieldDecoder, PackedFieldEncoder, Repeated
+    FieldDecoder, FieldEncoder, Fields, MessageFieldDecoder, MessageFieldEncoder, Oneof,
+    PackedFieldDecoder, PackedFieldEncoder, Repeated,
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
 use protobuf_codec::scalar::{Uint32Decoder, Uint32Encoder, Uint64Decoder, Uint64Encoder};
 
-use ::expect::Expect;
 use entity::object::ObjectVersion;
+use expect::Expect;
 use protobuf::object::{ObjectVersionsDecoder, ObjectVersionsEncoder};
 
 /// Decoder for `Expect`.
@@ -27,12 +26,19 @@ pub struct ExpectDecoder {
         )>,
     >,
 }
-impl_message_decode!(ExpectDecoder, Expect, |t: Branch4<u32, u32, Vec<u64>, Vec<u64>>| {
+impl_message_decode!(ExpectDecoder, Expect, |t: Branch4<
+    u32,
+    u32,
+    Vec<u64>,
+    Vec<u64>,
+>| {
     Ok(match t {
         Branch4::A(_) => Expect::Any,
         Branch4::B(_) => Expect::None,
         Branch4::C(versions) => Expect::IfMatch(versions.into_iter().map(ObjectVersion).collect()),
-        Branch4::D(versions) => Expect::IfNoneMatch(versions.into_iter().map(ObjectVersion).collect()),
+        Branch4::D(versions) => {
+            Expect::IfNoneMatch(versions.into_iter().map(ObjectVersion).collect())
+        }
     })
 });
 
@@ -48,7 +54,7 @@ pub struct ExpectEncoder {
         )>,
     >,
 }
-impl_message_encode!(ExpectEncoder, Expect, |item: Self::Item| {
+impl_sized_message_encode!(ExpectEncoder, Expect, |item: Self::Item| {
     match item {
         Expect::Any => Branch4::A(0),
         Expect::None => Branch4::B(1),

@@ -64,6 +64,7 @@ macro_rules! impl_sized_message_encode {
     };
 }
 
+// TODO remove
 macro_rules! impl_newtype_decode {
     ($decoder:ty, $item:ty) => {
         impl ::bytecodec::Decode for $decoder {
@@ -88,13 +89,14 @@ macro_rules! impl_newtype_decode {
         }
         impl ::protobuf_codec::value::ValueDecode for $decoder {
             fn wire_type(&self) -> ::protobuf_codec::wire::WireType {
-                use ::protobuf_codec::value::ValueDecode;
+                use protobuf_codec::value::ValueDecode;
                 self.0.wire_type()
             }
         }
     };
 }
 
+// TODO remove
 macro_rules! impl_newtype_encode {
     ($encoder:ty, $item:ty) => {
         impl ::bytecodec::Encode for $encoder {
@@ -123,7 +125,7 @@ macro_rules! impl_newtype_encode {
         }
         impl ::protobuf_codec::value::ValueEncode for $encoder {
             fn wire_type(&self) -> ::protobuf_codec::wire::WireType {
-                use ::protobuf_codec::value::ValueEncode;
+                use protobuf_codec::value::ValueEncode;
                 self.0.wire_type()
             }
         }

@@ -1,7 +1,9 @@
 //! object
 
 use protobuf_codec::field::num::{F1, F2, F3};
-use protobuf_codec::field::{FieldDecoder, FieldEncoder, Fields, MaybeDefault, PackedFieldDecoder, PackedFieldEncoder};
+use protobuf_codec::field::{
+    FieldDecoder, FieldEncoder, Fields, MaybeDefault, PackedFieldDecoder, PackedFieldEncoder,
+};
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
 use protobuf_codec::scalar::{
     BoolDecoder, BoolEncoder, BytesDecoder, BytesEncoder, StringDecoder, StringEncoder,
@@ -18,29 +20,19 @@ use entity::object::{
 // https://github.com/frugalos/frugalos/blob/346b56c23a0055f160da385668ce163ee8ff6e60/frugalos_mds/src/protobuf.rs#L185
 #[derive(Debug, Default)]
 pub struct ObjectVersionsDecoder {
-    inner: MessageDecoder<
-        Fields<(
-            PackedFieldDecoder<F1, Uint64Decoder, Vec<u64>>,
-        )>,
-    >,
+    inner: MessageDecoder<Fields<(PackedFieldDecoder<F1, Uint64Decoder, Vec<u64>>,)>>,
 }
-impl_message_decode!(ObjectVersionsDecoder, Vec<u64>, |t: (_,)| {
-Ok(t.0)
-});
+impl_message_decode!(ObjectVersionsDecoder, Vec<u64>, |t: (_,)| { Ok(t.0) });
 
 /// Encoder for `ObjectVersion`s.
 // 互換性に注意
 // https://github.com/frugalos/frugalos/blob/346b56c23a0055f160da385668ce163ee8ff6e60/frugalos_mds/src/protobuf.rs#L191
 #[derive(Debug, Default)]
 pub struct ObjectVersionsEncoder {
-    inner: MessageEncoder<
-        Fields<(
-            PackedFieldEncoder<F1, Uint64Encoder, Vec<u64>>,
-        )>,
-    >,
+    inner: MessageEncoder<Fields<(PackedFieldEncoder<F1, Uint64Encoder, Vec<u64>>,)>>,
 }
 impl_message_encode!(ObjectVersionsEncoder, Vec<u64>, |item: Self::Item| {
-(item,)
+    (item,)
 });
 
 /// Decoder for `ObjectSummary`.

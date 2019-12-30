@@ -41,12 +41,16 @@ pub struct ReadConsistencyEncoder {
         )>,
     >,
 }
-impl_sized_message_encode!(ReadConsistencyEncoder, ReadConsistency, |item: Self::Item| {
-    // TODO enum に対応する値が必要ない場合どうするか？を検討
-    match item {
-        ReadConsistency::Consistent => Branch4::A(0),
-        ReadConsistency::Stale => Branch4::B(0),
-        ReadConsistency::Quorum => Branch4::C(0),
-        ReadConsistency::Subset(n) => Branch4::D(n as u32),
+impl_sized_message_encode!(
+    ReadConsistencyEncoder,
+    ReadConsistency,
+    |item: Self::Item| {
+        // TODO enum に対応する値が必要ない場合どうするか？を検討
+        match item {
+            ReadConsistency::Consistent => Branch4::A(0),
+            ReadConsistency::Stale => Branch4::B(0),
+            ReadConsistency::Quorum => Branch4::C(0),
+            ReadConsistency::Subset(n) => Branch4::D(n as u32),
+        }
     }
-});
+);
