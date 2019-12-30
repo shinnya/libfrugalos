@@ -21,12 +21,12 @@ use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::deadline::{decode_deadline, encode_deadline, DeadlineDecoder, DeadlineEncoder};
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use protobuf::object::{
-    ObjectIdDecoder, ObjectIdEncoder, ObjectVersionDecoder, ObjectVersionEncoder,
-    ObjectVersionsDecoder,
+    ObjectIdDecoder, ObjectIdEncoder, ObjectRangeDecoder, ObjectRangeEncoder, ObjectVersionDecoder,
+    ObjectVersionEncoder, ObjectVersionsDecoder,
 };
 use schema::frugalos::{
-    CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, SegmentRequest,
-    VersionRequest,
+    CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, RangeRequest,
+    SegmentRequest, VersionRequest,
 };
 
 /// Decoder for `ObjectRequest`.
@@ -233,7 +233,7 @@ pub struct VersionRequestEncoder {
         Fields<(
             FieldEncoder<F1, BucketIdEncoder>,
             FieldEncoder<F2, Uint32Encoder>,
-            FieldEncoder<F4, ObjectVersionEncoder>,
+            FieldEncoder<F3, ObjectVersionEncoder>,
             FieldEncoder<F4, DeadlineEncoder>,
         )>,
     >,
@@ -243,6 +243,49 @@ impl_sized_message_encode!(VersionRequestEncoder, VersionRequest, |item: Self::I
         item.bucket_id,
         item.segment as u32,
         item.object_version.0,
+        encode_deadline(item.deadline),
+    )
+});
+
+///// Decoder for `RangeRequest`.
+#[derive(Debug)]
+pub struct RangeRequestDecoder {
+    inner: MessageDecoder<
+        Fields<(
+            MaybeDefault<FieldDecoder<F1, BucketIdDecoder>>,
+            MaybeDefault<FieldDecoder<F2, Uint32Decoder>>,
+            MessageFieldDecoder<F3, ObjectRangeDecoder>,
+            MaybeDefault<FieldDecoder<F4, DeadlineDecoder>>,
+        )>,
+    >,
+}
+impl_message_decode!(RangeRequestDecoder, RangeRequest, |t: (String, _, _, _,)| {
+    let deadline = track!(decode_deadline(t.3))?;
+    Ok(RangeRequest {
+        bucket_id: t.0.clone(),
+        segment: t.1 as u16,
+        targets: t.2,
+        deadline,
+    })
+});
+
+/// Encoder for `RangeRequest`.
+#[derive(Debug)]
+pub struct RangeRequestEncoder {
+    inner: MessageEncoder<
+        Fields<(
+            FieldEncoder<F1, BucketIdEncoder>,
+            FieldEncoder<F2, Uint32Encoder>,
+            MessageFieldEncoder<F3, ObjectRangeEncoder>,
+            FieldEncoder<F4, DeadlineEncoder>,
+        )>,
+    >,
+}
+impl_sized_message_encode!(RangeRequestEncoder, RangeRequest, |item: Self::Item| {
+    (
+        item.bucket_id,
+        item.segment as u32,
+        item.targets,
         encode_deadline(item.deadline),
     )
 });

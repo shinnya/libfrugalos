@@ -9,6 +9,7 @@ use protobuf_codec::scalar::{
     BoolDecoder, BoolEncoder, BytesDecoder, BytesEncoder, StringDecoder, StringEncoder,
     Uint32Decoder, Uint32Encoder, Uint64Decoder, Uint64Encoder,
 };
+use std::ops::Range;
 
 use entity::object::{
     DeleteObjectsByPrefixSummary, FragmentsSummary, Metadata, ObjectPrefix, ObjectSummary,
@@ -46,6 +47,41 @@ pub struct ObjectVersionsEncoder {
 impl_message_encode!(ObjectVersionsEncoder, Vec<u64>, |item: Self::Item| {
     (item,)
 });
+
+/// Decoder for `ObjectRange`.
+#[derive(Debug, Default)]
+pub struct ObjectRangeDecoder {
+    inner: MessageDecoder<
+        Fields<(
+            MaybeDefault<FieldDecoder<F1, ObjectVersionDecoder>>,
+            MaybeDefault<FieldDecoder<F2, ObjectVersionDecoder>>,
+        )>,
+    >,
+}
+
+impl_message_decode!(ObjectRangeDecoder, Range<ObjectVersion>, |t: (u64, u64)| {
+    Ok(Range {
+        start: ObjectVersion(t.0),
+        end: ObjectVersion(t.1),
+    })
+});
+
+/// Encoder for `ObjectRange`.
+#[derive(Debug, Default)]
+pub struct ObjectRangeEncoder {
+    inner: MessageEncoder<
+        Fields<(
+            FieldEncoder<F1, ObjectVersionEncoder>,
+            FieldEncoder<F2, ObjectVersionEncoder>,
+        )>,
+    >,
+}
+
+impl_sized_message_encode!(
+    ObjectRangeEncoder,
+    Range<ObjectVersion>,
+    |item: Self::Item| { (item.start.0, item.end.0) }
+);
 
 /// Decoder for `ObjectSummary`.
 #[derive(Debug, Default)]
