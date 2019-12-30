@@ -14,7 +14,13 @@ use entity::object::{
 };
 use expect::Expect;
 use multiplicity::MultiplicityConfig;
-use protobuf::schema::frugalos::{ObjectRequestDecoder, ObjectRequestEncoder, HeadObjectRequestDecoder, HeadObjectRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder, SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder, RangeRequestDecoder, RangeRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder, CountFragmentsRequestDecoder, CountFragmentsRequestEncoder};
+use protobuf::schema::frugalos::{
+    CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, HeadObjectRequestDecoder,
+    HeadObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder,
+    ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
+    PutObjectRequestDecoder, PutObjectRequestEncoder, RangeRequestDecoder, RangeRequestEncoder,
+    SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
+};
 use repair::RepairConfig;
 use Result;
 

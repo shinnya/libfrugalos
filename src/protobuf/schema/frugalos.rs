@@ -16,14 +16,14 @@ use protobuf_codec::scalar::{
 use consistency::ReadConsistency;
 use entity::object::ObjectVersion;
 use expect::Expect;
-use protobuf::bucket::{BucketIdDecoder, BucketIdEncoder};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::deadline::{decode_deadline, encode_deadline, DeadlineDecoder, DeadlineEncoder};
-use protobuf::expect::{ExpectDecoder, ExpectEncoder};
-use protobuf::object::{
+use protobuf::entity::bucket::{BucketIdDecoder, BucketIdEncoder};
+use protobuf::entity::object::{
     ObjectIdDecoder, ObjectIdEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
     ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder, ObjectVersionsDecoder,
 };
+use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use schema::frugalos::{
     CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, PrefixRequest,
     PutObjectRequest, RangeRequest, SegmentRequest, VersionRequest,

@@ -12,7 +12,7 @@ use protobuf_codec::scalar::{Uint32Decoder, Uint32Encoder, Uint64Decoder, Uint64
 
 use entity::object::ObjectVersion;
 use expect::Expect;
-use protobuf::object::{ObjectVersionsDecoder, ObjectVersionsEncoder};
+use protobuf::entity::object::{ObjectVersionsDecoder, ObjectVersionsEncoder};
 
 /// Decoder for `Expect`.
 #[derive(Debug, Default)]
