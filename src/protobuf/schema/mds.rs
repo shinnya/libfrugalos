@@ -12,17 +12,24 @@ use protobuf_codec::scalar::{
 };
 use std::time::Duration;
 
-use entity::object::{Metadata, ObjectVersion};
+use entity::node::LocalNodeId;
+use entity::object::{DeleteObjectsByPrefixSummary, Metadata, ObjectSummary, ObjectVersion};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::entity::node::{LocalNodeIdDecoder, LocalNodeIdEncoder};
 use protobuf::entity::object::{
-    ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder, ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder, MetadataDecoder, MetadataEncoder};
+    DeleteObjectsByPrefixSummaryDecoder, DeleteObjectsByPrefixSummaryEncoder, MetadataDecoder,
+    MetadataEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
+    ObjectRangeEncoder, ObjectSummaryDecoder, ObjectSummaryEncoder, ObjectVersionDecoder,
+    ObjectVersionEncoder,
+};
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
+use protobuf::{
+    OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder, VecDecoder, VecEncoder,
+};
 use schema::mds::{
     ListObjectsRequest, ObjectCountRequest, ObjectRequest, PrefixRequest, PutObjectRequest,
     RangeRequest, VersionRequest,
 };
-use protobuf::{ResultDecoder, ResultEncoder, OptionDecoder, OptionEncoder};
 use Result;
 
 /// Decoder for `ObjectRequest`.
@@ -288,16 +295,292 @@ impl_sized_message_encode!(
     }
 );
 
-/// Decoder for `GetObjectResponse`.
+/// Decoder for a response of [GetLeaderRpc].
 #[derive(Debug, Default)]
-pub struct GetObjectResponseDecoder {
+pub struct GetLeaderRpcResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<
+            F1,
+            ResultDecoder<MessageDecoder<FieldDecoder<F1, LocalNodeIdDecoder>>>,
+        >,
+    >,
+}
+impl_message_decode!(GetLeaderRpcResponseDecoder, Result<LocalNodeId>, |t: _| Ok(
+    t
+));
+
+/// Encoder for a response of [GetLeaderRpc].
+#[derive(Debug, Default)]
+pub struct GetLeaderRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<
+            F1,
+            ResultEncoder<MessageEncoder<FieldEncoder<F1, LocalNodeIdEncoder>>>,
+        >,
+    >,
+}
+impl_message_encode!(
+    GetLeaderRpcResponseEncoder,
+    Result<LocalNodeId>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `ListObjectsRpc`.
+#[derive(Debug, Default)]
+pub struct ListObjectsRpcResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<VecDecoder<ObjectSummaryDecoder>>>>,
+}
+impl_message_decode!(
+    ListObjectsRpcResponseDecoder,
+    Result<Vec<ObjectSummary>>,
+    |t: _| Ok(t)
+);
+
+/// Encoder for a response of `ListObjectsRpc`.
+#[derive(Debug, Default)]
+pub struct ListObjectsRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<F1, PreEncode<ResultEncoder<VecEncoder<ObjectSummaryEncoder>>>>,
+    >,
+}
+impl_message_encode!(
+    ListObjectsRpcResponseEncoder,
+    Result<Vec<ObjectSummary>>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `GetObjectRpc`.
+#[derive(Debug, Default)]
+pub struct GetObjectRpcResponseDecoder {
     inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<OptionDecoder<MetadataDecoder>>>>,
 }
-impl_message_decode!(GetObjectResponseDecoder, Result<Option<Metadata>>, |t: _| Ok(t));
+impl_message_decode!(
+    GetObjectRpcResponseDecoder,
+    Result<Option<Metadata>>,
+    |t: _| Ok(t)
+);
 
-/// Encoder for `GetObjectResponse`.
+/// Encoder for a response of `GetObjectRpc`.
 #[derive(Debug, Default)]
-pub struct GetObjectResponseEncoder {
+pub struct GetObjectRpcResponseEncoder {
     inner: MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<OptionEncoder<MetadataEncoder>>>>,
 }
-impl_message_encode!(GetObjectResponseEncoder, Result<Option<Metadata>>, |item: Self::Item| item);
+impl_message_encode!(
+    GetObjectRpcResponseEncoder,
+    Result<Option<Metadata>>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `HeadObjectRpc`.
+#[derive(Debug, Default)]
+pub struct HeadObjectRpcResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<
+            F1,
+            ResultDecoder<OptionDecoder<MessageDecoder<FieldDecoder<F1, ObjectVersionDecoder>>>>,
+        >,
+    >,
+}
+impl_message_decode!(
+    HeadObjectRpcResponseDecoder,
+    Result<Option<ObjectVersion>>,
+    |t: Result<Option<u64>>| Ok(t.map(|x| x.map(ObjectVersion)))
+);
+
+/// Encoder for a response of `HeadObjectRpc`.
+#[derive(Debug, Default)]
+pub struct HeadObjectRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<
+            F1,
+            ResultEncoder<OptionEncoder<MessageEncoder<FieldEncoder<F1, ObjectVersionEncoder>>>>,
+        >,
+    >,
+}
+impl_message_encode!(
+    HeadObjectRpcResponseEncoder,
+    Result<Option<ObjectVersion>>,
+    |item: Self::Item| item.map(|x| x.map(|v| v.0))
+);
+
+/// Decoder for a response of `DeleteObjectRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectRpcResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<
+            F1,
+            ResultDecoder<OptionDecoder<MessageDecoder<FieldDecoder<F1, ObjectVersionDecoder>>>>,
+        >,
+    >,
+}
+impl_message_decode!(
+    DeleteObjectRpcResponseDecoder,
+    Result<Option<ObjectVersion>>,
+    |t: Result<Option<u64>>| Ok(t.map(|x| x.map(ObjectVersion)))
+);
+
+/// Encoder for a response of `DeleteObjectRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<
+            F1,
+            ResultEncoder<OptionEncoder<MessageEncoder<FieldEncoder<F1, ObjectVersionEncoder>>>>,
+        >,
+    >,
+}
+impl_message_encode!(
+    DeleteObjectRpcResponseEncoder,
+    Result<Option<ObjectVersion>>,
+    |item: Self::Item| item.map(|x| x.map(|v| v.0))
+);
+
+/// Decoder for a response of `GetLatestVersionRpc`.
+#[derive(Debug, Default)]
+pub struct GetLatestVersionRpcResponseDecoder {
+    inner:
+        MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<OptionDecoder<ObjectSummaryDecoder>>>>,
+}
+impl_message_decode!(
+    GetLatestVersionRpcResponseDecoder,
+    Result<Option<ObjectSummary>>,
+    |t: _| Ok(t)
+);
+
+/// Encoder for a response of `GetLatestVersionRpc`.
+#[derive(Debug, Default)]
+pub struct GetLatestVersionRpcResponseEncoder {
+    inner:
+        MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<OptionEncoder<ObjectSummaryEncoder>>>>,
+}
+impl_message_encode!(
+    GetLatestVersionRpcResponseEncoder,
+    Result<Option<ObjectSummary>>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `DeleteObjectByVersionRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectByVersionRpcResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<
+            F1,
+            ResultDecoder<OptionDecoder<MessageDecoder<FieldDecoder<F1, ObjectVersionDecoder>>>>,
+        >,
+    >,
+}
+impl_message_decode!(
+    DeleteObjectByVersionRpcResponseDecoder,
+    Result<Option<ObjectVersion>>,
+    |t: Result<Option<u64>>| Ok(t.map(|x| x.map(ObjectVersion)))
+);
+
+/// Encoder for a response of `DeleteObjectByVersionRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectByVersionRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<
+            F1,
+            ResultEncoder<OptionEncoder<MessageEncoder<FieldEncoder<F1, ObjectVersionEncoder>>>>,
+        >,
+    >,
+}
+impl_message_encode!(
+    DeleteObjectByVersionRpcResponseEncoder,
+    Result<Option<ObjectVersion>>,
+    |item: Self::Item| item.map(|x| x.map(|v| v.0))
+);
+
+/// Decoder for a response of `DeleteObjectsByRangeRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectsByRangeRpcResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<VecDecoder<ObjectSummaryDecoder>>>>,
+}
+impl_message_decode!(
+    DeleteObjectsByRangeRpcResponseDecoder,
+    Result<Vec<ObjectSummary>>,
+    |t: _| Ok(t)
+);
+
+/// Encoder for a response of `DeleteObjectsByRangeRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectsByRangeRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<F1, PreEncode<ResultEncoder<VecEncoder<ObjectSummaryEncoder>>>>,
+    >,
+}
+impl_message_encode!(
+    DeleteObjectsByRangeRpcResponseEncoder,
+    Result<Vec<ObjectSummary>>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `GetObjectCountRpc`.
+#[derive(Debug, Default)]
+pub struct GetObjectCountRpcResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<F1, ResultDecoder<MessageDecoder<FieldDecoder<F1, Uint64Decoder>>>>,
+    >,
+}
+impl_message_decode!(GetObjectCountRpcResponseDecoder, Result<u64>, |t: _| Ok(t));
+
+/// Encoder for a response of `GetObjectCountRpc`.
+#[derive(Debug, Default)]
+pub struct GetObjectCountRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<F1, ResultEncoder<MessageEncoder<FieldEncoder<F1, Uint64Encoder>>>>,
+    >,
+}
+impl_message_encode!(
+    GetObjectCountRpcResponseEncoder,
+    Result<u64>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `DeleteObjectsByPrefixRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectsByPrefixRpcResponseDecoder {
+    inner:
+        MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<DeleteObjectsByPrefixSummaryDecoder>>>,
+}
+impl_message_decode!(
+    DeleteObjectsByPrefixRpcResponseDecoder,
+    Result<DeleteObjectsByPrefixSummary>,
+    |t: _| Ok(t)
+);
+
+/// Encoder for a response of `DeleteObjectsByPrefixRpc`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectsByPrefixRpcResponseEncoder {
+    inner:
+        MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<DeleteObjectsByPrefixSummaryEncoder>>>,
+}
+impl_message_encode!(
+    DeleteObjectsByPrefixRpcResponseEncoder,
+    Result<DeleteObjectsByPrefixSummary>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `ListObjectsByPrefixRpc`.
+#[derive(Debug, Default)]
+pub struct ListObjectsByPrefixRpcResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<VecDecoder<ObjectSummaryDecoder>>>>,
+}
+impl_message_decode!(
+    ListObjectsByPrefixRpcResponseDecoder,
+    Result<Vec<ObjectSummary>>,
+    |t: _| Ok(t)
+);
+
+/// Encoder for a response of `ListObjectsByPrefixRpc`.
+#[derive(Debug, Default)]
+pub struct ListObjectsByPrefixRpcResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<F1, PreEncode<ResultEncoder<VecEncoder<ObjectSummaryEncoder>>>>,
+    >,
+}
+impl_message_encode!(
+    ListObjectsByPrefixRpcResponseEncoder,
+    Result<Vec<ObjectSummary>>,
+    |item: Self::Item| item
+);
