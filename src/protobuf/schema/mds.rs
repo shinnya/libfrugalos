@@ -12,18 +12,18 @@ use protobuf_codec::scalar::{
 };
 use std::time::Duration;
 
-use entity::object::ObjectVersion;
+use entity::object::{Metadata, ObjectVersion};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::entity::node::{LocalNodeIdDecoder, LocalNodeIdEncoder};
 use protobuf::entity::object::{
-    ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder, ObjectRangeEncoder,
-    ObjectVersionDecoder, ObjectVersionEncoder,
-};
+    ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder, ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder, MetadataDecoder, MetadataEncoder};
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use schema::mds::{
     ListObjectsRequest, ObjectCountRequest, ObjectRequest, PrefixRequest, PutObjectRequest,
     RangeRequest, VersionRequest,
 };
+use protobuf::{ResultDecoder, ResultEncoder, OptionDecoder, OptionEncoder};
+use Result;
 
 /// Decoder for `ObjectRequest`.
 #[derive(Debug, Default)]
@@ -287,3 +287,17 @@ impl_sized_message_encode!(
         )
     }
 );
+
+/// Decoder for `GetObjectResponse`.
+#[derive(Debug, Default)]
+pub struct GetObjectResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<OptionDecoder<MetadataDecoder>>>>,
+}
+impl_message_decode!(GetObjectResponseDecoder, Result<Option<Metadata>>, |t: _| Ok(t));
+
+/// Encoder for `GetObjectResponse`.
+#[derive(Debug, Default)]
+pub struct GetObjectResponseEncoder {
+    inner: MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<OptionEncoder<MetadataEncoder>>>>,
+}
+impl_message_encode!(GetObjectResponseEncoder, Result<Option<Metadata>>, |item: Self::Item| item);
