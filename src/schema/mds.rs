@@ -11,10 +11,17 @@ use entity::object::{
 };
 use expect::Expect;
 use protobuf::schema::mds::{
-    ListObjectsRequestDecoder, ListObjectsRequestEncoder, ObjectCountRequestDecoder,
-    ObjectCountRequestEncoder, ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder,
-    PrefixRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder, RangeRequestDecoder,
-    RangeRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
+    DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
+    GetLeaderResponseDecoder, GetLeaderResponseEncoder, ListObjectsRequestDecoder,
+    ListObjectsRequestEncoder, MaybeMetadataResponseDecoder, MaybeMetadataResponseEncoder,
+    MaybeObjectSummaryResponseDecoder, MaybeObjectSummaryResponseEncoder,
+    MaybeObjectVersionResponseDecoder, MaybeObjectVersionResponseEncoder,
+    ObjectCountRequestDecoder, ObjectCountRequestEncoder, ObjectCountResponseDecoder,
+    ObjectCountResponseEncoder, ObjectRequestDecoder, ObjectRequestEncoder,
+    ObjectSummarySequenceResponseDecoder, ObjectSummarySequenceResponseEncoder,
+    PrefixRequestDecoder, PrefixRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder,
+    PutObjectResponseDecoder, PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
+    VersionRequestDecoder, VersionRequestEncoder,
 };
 use Result;
 
@@ -30,8 +37,8 @@ impl Call for GetLeaderRpc {
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<RemoteNodeId>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = GetLeaderResponseDecoder;
+    type ResEncoder = GetLeaderResponseEncoder;
 }
 
 /// リーダ推薦（再選挙）RPC。
@@ -58,8 +65,8 @@ impl Call for ListObjectsRpc {
     type ReqEncoder = ListObjectsRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ObjectSummarySequenceResponseDecoder;
+    type ResEncoder = ObjectSummarySequenceResponseEncoder;
 
     fn enable_async_response(_: &Self::Res) -> bool {
         true
@@ -78,8 +85,8 @@ impl Call for GetObjectRpc {
     type ReqEncoder = ObjectRequestEncoder;
 
     type Res = Result<Option<Metadata>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeMetadataResponseDecoder;
+    type ResEncoder = MaybeMetadataResponseEncoder;
 }
 
 /// オブジェクト存在確認RPC。
@@ -94,8 +101,8 @@ impl Call for HeadObjectRpc {
     type ReqEncoder = ObjectRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectVersionResponseDecoder;
+    type ResEncoder = MaybeObjectVersionResponseEncoder;
 }
 
 /// オブジェクト保存RPC。
@@ -110,8 +117,8 @@ impl Call for PutObjectRpc {
     type ReqEncoder = PutObjectRequestEncoder;
 
     type Res = Result<(ObjectVersion, Option<ObjectVersion>)>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = PutObjectResponseDecoder;
+    type ResEncoder = PutObjectResponseEncoder;
 }
 
 /// オブジェクト削除RPC。
@@ -126,8 +133,8 @@ impl Call for DeleteObjectRpc {
     type ReqEncoder = ObjectRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectVersionResponseDecoder;
+    type ResEncoder = MaybeObjectVersionResponseEncoder;
 }
 
 /// 最新バージョン取得RPC。
@@ -142,8 +149,8 @@ impl Call for GetLatestVersionRpc {
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<Option<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectSummaryResponseDecoder;
+    type ResEncoder = MaybeObjectSummaryResponseEncoder;
 }
 
 /// バージョン指定による削除RPC。
@@ -158,8 +165,8 @@ impl Call for DeleteObjectByVersionRpc {
     type ReqEncoder = VersionRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectVersionResponseDecoder;
+    type ResEncoder = MaybeObjectVersionResponseEncoder;
 }
 
 /// バージョン範囲指定による削除RPC。
@@ -174,8 +181,8 @@ impl Call for DeleteObjectsByRangeRpc {
     type ReqEncoder = RangeRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ObjectSummarySequenceResponseDecoder;
+    type ResEncoder = ObjectSummarySequenceResponseEncoder;
 }
 
 /// 格納済みオブジェクト数取得RPC。
@@ -190,8 +197,8 @@ impl Call for GetObjectCountRpc {
     type ReqEncoder = ObjectCountRequestEncoder;
 
     type Res = Result<u64>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ObjectCountResponseDecoder;
+    type ResEncoder = ObjectCountResponseEncoder;
 }
 
 /// 接頭辞削除RPC。
@@ -206,8 +213,8 @@ impl Call for DeleteObjectsByPrefixRpc {
     type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<DeleteObjectsByPrefixSummary>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = DeleteObjectsByPrefixSummaryResponseDecoder;
+    type ResEncoder = DeleteObjectsByPrefixSummaryResponseEncoder;
 }
 
 /// 接頭辞指定でのオブジェクト一覧取得RPC。
@@ -222,8 +229,8 @@ impl Call for ListObjectsByPrefixRpc {
     type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ObjectSummarySequenceResponseDecoder;
+    type ResEncoder = ObjectSummarySequenceResponseEncoder;
 
     fn enable_async_response(_: &Self::Res) -> bool {
         true
