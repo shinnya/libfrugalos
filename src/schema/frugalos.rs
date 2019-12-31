@@ -1,6 +1,7 @@
 //! frugalosの公開API系RPCのスキーマ定義。
 use bytecodec::bincode_codec::{BincodeDecoder, BincodeEncoder};
 use fibers_rpc::{Call, ProcedureId};
+use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use std::collections::BTreeSet;
 use std::ops::Range;
 use std::time::Duration;
@@ -14,12 +15,19 @@ use entity::object::{
 };
 use expect::Expect;
 use multiplicity::MultiplicityConfig;
+use protobuf::entity::object::{
+    DeleteObjectsByPrefixSummaryDecoder, DeleteObjectsByPrefixSummaryEncoder,
+    FragmentsSummaryDecoder, FragmentsSummaryEncoder, ObjectSummaryDecoder, ObjectSummaryEncoder,
+};
 use protobuf::schema::frugalos::{
     CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, HeadObjectRequestDecoder,
     HeadObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder,
     ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
     PutObjectRequestDecoder, PutObjectRequestEncoder, RangeRequestDecoder, RangeRequestEncoder,
     SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
+};
+use protobuf::{
+    OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder, VecDecoder, VecEncoder,
 };
 use repair::RepairConfig;
 use Result;
@@ -102,8 +110,8 @@ impl Call for ListObjectsRpc {
     type ReqEncoder = ListObjectsRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<VecDecoder<ObjectSummaryDecoder>>;
+    type ResEncoder = ResultEncoder<VecEncoder<ObjectSummaryEncoder>>;
 
     fn enable_async_response(_: &Self::Res) -> bool {
         true
@@ -122,8 +130,8 @@ impl Call for GetLatestVersionRpc {
     type ReqEncoder = SegmentRequestEncoder;
 
     type Res = Result<Option<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<OptionDecoder<ObjectSummaryDecoder>>;
+    type ResEncoder = ResultEncoder<OptionEncoder<ObjectSummaryEncoder>>;
 }
 
 /// バージョン指定でのオブジェクト削除RPC。
@@ -154,8 +162,8 @@ impl Call for DeleteObjectsByRangeRpc {
     type ReqEncoder = RangeRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<VecDecoder<ObjectSummaryDecoder>>;
+    type ResEncoder = ResultEncoder<VecEncoder<ObjectSummaryEncoder>>;
 
     /*
     NOTE:
@@ -180,8 +188,8 @@ impl Call for DeleteObjectsByPrefixRpc {
     type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<DeleteObjectsByPrefixSummary>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<DeleteObjectsByPrefixSummaryDecoder>;
+    type ResEncoder = ResultEncoder<DeleteObjectsByPrefixSummaryEncoder>;
 }
 
 /// An RPC for deleting objects physically.
@@ -192,7 +200,7 @@ impl Call for DeleteObjectSetFromDeviceRpc {
     const NAME: &'static str = "frugalos.object.delete_object_set_from_device";
 
     type Req = DeleteObjectSetFromDeviceRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqDecoder = BincodeDecoder<Self::Req>; // TODO protobuf
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<()>;
@@ -212,8 +220,8 @@ impl Call for ListObjectsByPrefixRpc {
     type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<VecDecoder<ObjectSummaryDecoder>>;
+    type ResEncoder = ResultEncoder<VecEncoder<ObjectSummaryEncoder>>;
 
     fn enable_async_response(_: &Self::Res) -> bool {
         true
@@ -232,8 +240,8 @@ impl Call for CountFragmentsRpc {
     type ReqEncoder = CountFragmentsRequestEncoder;
 
     type Res = Result<Option<FragmentsSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<OptionDecoder<FragmentsSummaryDecoder>>;
+    type ResEncoder = ResultEncoder<OptionEncoder<FragmentsSummaryEncoder>>;
 }
 
 /// オブジェクト単位のRPC要求。
@@ -350,12 +358,12 @@ impl Call for StopRpc {
     const NAME: &'static str = "frugalos.ctrl.stop";
 
     type Req = ();
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = EmptyMessageDecoder;
+    type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<()>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<EmptyMessageDecoder>;
+    type ResEncoder = ResultEncoder<EmptyMessageEncoder>;
 }
 
 /// スナップショット取得RPC。
@@ -366,12 +374,12 @@ impl Call for TakeSnapshotRpc {
     const NAME: &'static str = "frugalos.ctrl.take_snapshot";
 
     type Req = ();
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = EmptyMessageDecoder;
+    type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<()>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ResultDecoder<EmptyMessageDecoder>;
+    type ResEncoder = ResultEncoder<EmptyMessageEncoder>;
 }
 
 /// An RPC for changing configuration of repair functionality.

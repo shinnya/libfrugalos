@@ -4,7 +4,7 @@ use bytecodec::combinator::PreEncode;
 use bytecodec::SizedEncode;
 use protobuf_codec::field::branch::Branch2;
 use protobuf_codec::field::num::{F1, F2};
-use protobuf_codec::field::{MessageFieldDecoder, MessageFieldEncoder, Oneof};
+use protobuf_codec::field::{MessageFieldDecoder, MessageFieldEncoder, Oneof, Optional, Repeated};
 use protobuf_codec::message::{MessageDecode, MessageDecoder, MessageEncode, MessageEncoder};
 use trackable::error::ErrorKindExt;
 
@@ -18,9 +18,139 @@ pub mod error;
 pub mod expect;
 pub mod schema;
 
+// TODO Vec を汎用化する
+/// Decoder for `Vec`.
+#[derive(Debug, Default)]
+pub struct VecDecoder<D>
+where
+    D: MessageDecode,
+{
+    inner: MessageDecoder<Repeated<MessageFieldDecoder<F1, D>, Vec<D::Item>>>,
+}
+impl<D: MessageDecode> ::bytecodec::Decode for VecDecoder<D> {
+    type Item = Vec<D::Item>;
+
+    fn decode(&mut self, buf: &[u8], eos: ::bytecodec::Eos) -> ::bytecodec::Result<usize> {
+        track!(self.inner.decode(buf, eos))
+    }
+
+    fn finish_decoding(&mut self) -> ::bytecodec::Result<Self::Item> {
+        track!(self.inner.finish_decoding())
+    }
+
+    fn requiring_bytes(&self) -> ::bytecodec::ByteCount {
+        self.inner.requiring_bytes()
+    }
+
+    fn is_idle(&self) -> bool {
+        self.inner.is_idle()
+    }
+}
+impl<D: MessageDecode> ::protobuf_codec::message::MessageDecode for VecDecoder<D> {}
+
+/// Encoder for `Vec`.
+#[derive(Debug, Default)]
+pub struct VecEncoder<E>
+where
+    E: MessageEncode,
+{
+    inner: MessageEncoder<Repeated<MessageFieldEncoder<F1, PreEncode<E>>, Vec<E::Item>>>,
+}
+impl<E: MessageEncode> ::bytecodec::Encode for VecEncoder<E> {
+    type Item = Vec<E::Item>;
+
+    fn encode(&mut self, buf: &mut [u8], eos: ::bytecodec::Eos) -> ::bytecodec::Result<usize> {
+        track!(self.inner.encode(buf, eos))
+    }
+
+    fn start_encoding(&mut self, item: Self::Item) -> ::bytecodec::Result<()> {
+        track!(self.inner.start_encoding(item))
+    }
+
+    fn requiring_bytes(&self) -> ::bytecodec::ByteCount {
+        self.inner.requiring_bytes()
+    }
+
+    fn is_idle(&self) -> bool {
+        self.inner.is_idle()
+    }
+}
+impl<E: MessageEncode> ::protobuf_codec::message::MessageEncode for VecEncoder<E> {}
+//impl<E: MessageEncode + SizedEncode> ::bytecodec::SizedEncode for VecEncoder<E> {
+//    fn exact_requiring_bytes(&self) -> u64 {
+//        self.inner.exact_requiring_bytes()
+//    }
+//}
+
+/// Decoder for `Option`.
+#[derive(Debug, Default)]
+pub struct OptionDecoder<D>
+where
+    D: MessageDecode,
+{
+    inner: MessageDecoder<Optional<MessageFieldDecoder<F1, D>>>,
+}
+impl<D: MessageDecode> ::bytecodec::Decode for OptionDecoder<D> {
+    type Item = Option<D::Item>;
+
+    fn decode(&mut self, buf: &[u8], eos: ::bytecodec::Eos) -> ::bytecodec::Result<usize> {
+        track!(self.inner.decode(buf, eos))
+    }
+
+    fn finish_decoding(&mut self) -> ::bytecodec::Result<Self::Item> {
+        track!(self.inner.finish_decoding())
+    }
+
+    fn requiring_bytes(&self) -> ::bytecodec::ByteCount {
+        self.inner.requiring_bytes()
+    }
+
+    fn is_idle(&self) -> bool {
+        self.inner.is_idle()
+    }
+}
+impl<D: MessageDecode> ::protobuf_codec::message::MessageDecode for OptionDecoder<D> {}
+
+/// Encoder for `Option`.
+#[derive(Debug, Default)]
+pub struct OptionEncoder<E>
+where
+    E: MessageEncode,
+{
+    inner: MessageEncoder<Optional<MessageFieldEncoder<F1, PreEncode<E>>>>,
+}
+impl<E: MessageEncode> ::bytecodec::Encode for OptionEncoder<E> {
+    type Item = Option<E::Item>;
+
+    fn encode(&mut self, buf: &mut [u8], eos: ::bytecodec::Eos) -> ::bytecodec::Result<usize> {
+        track!(self.inner.encode(buf, eos))
+    }
+
+    fn start_encoding(&mut self, item: Self::Item) -> ::bytecodec::Result<()> {
+        track!(self.inner.start_encoding(item))
+    }
+
+    fn requiring_bytes(&self) -> ::bytecodec::ByteCount {
+        self.inner.requiring_bytes()
+    }
+
+    fn is_idle(&self) -> bool {
+        self.inner.is_idle()
+    }
+}
+impl<E: MessageEncode> ::protobuf_codec::message::MessageEncode for OptionEncoder<E> {}
+impl<E: MessageEncode + SizedEncode> ::bytecodec::SizedEncode for OptionEncoder<E> {
+    fn exact_requiring_bytes(&self) -> u64 {
+        self.inner.exact_requiring_bytes()
+    }
+}
+
 /// Decoder for `Result`.
 #[derive(Debug, Default)]
-pub struct ResultDecoder<D: MessageDecode> {
+pub struct ResultDecoder<D>
+where
+    D: MessageDecode,
+{
     inner: MessageDecoder<
         Oneof<(
             MessageFieldDecoder<F1, D>,
@@ -55,15 +185,18 @@ impl<D: MessageDecode> ::protobuf_codec::message::MessageDecode for ResultDecode
 
 /// Encoder for `Result`.
 #[derive(Debug, Default)]
-pub struct ResultEncoder<E: MessageEncode + SizedEncode> {
+pub struct ResultEncoder<E>
+where
+    E: MessageEncode,
+{
     inner: MessageEncoder<
         Oneof<(
-            MessageFieldEncoder<F1, E>,
+            MessageFieldEncoder<F1, PreEncode<E>>,
             MessageFieldEncoder<F2, PreEncode<ErrorEncoder>>,
         )>,
     >,
 }
-impl<E: MessageEncode + SizedEncode> ::bytecodec::Encode for ResultEncoder<E> {
+impl<E: MessageEncode> ::bytecodec::Encode for ResultEncoder<E> {
     type Item = Result<E::Item>;
 
     fn encode(&mut self, buf: &mut [u8], eos: ::bytecodec::Eos) -> ::bytecodec::Result<usize> {
@@ -89,7 +222,7 @@ impl<E: MessageEncode + SizedEncode> ::bytecodec::Encode for ResultEncoder<E> {
         self.inner.is_idle()
     }
 }
-impl<E: MessageEncode + SizedEncode> ::protobuf_codec::message::MessageEncode for ResultEncoder<E> {}
+impl<E: MessageEncode> ::protobuf_codec::message::MessageEncode for ResultEncoder<E> {}
 impl<E: MessageEncode + SizedEncode> ::bytecodec::SizedEncode for ResultEncoder<E> {
     fn exact_requiring_bytes(&self) -> u64 {
         self.inner.exact_requiring_bytes()
