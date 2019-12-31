@@ -112,7 +112,7 @@ pub struct DeviceEncoder {
     >,
 }
 
-impl_message_encode!(DeviceEncoder, Device, |item: Self::Item| match item {
+impl_sized_message_encode!(DeviceEncoder, Device, |item: Self::Item| match item {
     Device::Virtual(device) => Branch3::A(device),
     Device::Memory(device) => Branch3::B(device),
     Device::File(device) => Branch3::C(device),

@@ -10,6 +10,16 @@ use entity::server::{Server, ServerId, ServerSummary};
 use protobuf::entity::bucket::{BucketDecoder, BucketEncoder, BucketIdDecoder, BucketIdEncoder};
 use protobuf::entity::device::{DeviceDecoder, DeviceEncoder, DeviceIdDecoder, DeviceIdEncoder};
 use protobuf::entity::server::{ServerDecoder, ServerEncoder, ServerIdDecoder, ServerIdEncoder};
+use protobuf::schema::config::{
+    DeleteBucketResponseDecoder, DeleteBucketResponseEncoder, DeleteDeviceResponseDecoder,
+    DeleteDeviceResponseEncoder, DeleteServerResponseDecoder, DeleteServerResponseEncoder,
+    GetBucketResponseDecoder, GetBucketResponseEncoder, GetDeviceResponseDecoder,
+    GetDeviceResponseEncoder, GetServerResponseDecoder, GetServerResponseEncoder,
+    ListBucketsResponseDecoder, ListBucketsResponseEncoder, ListDevicesResponseDecoder,
+    ListDevicesResponseEncoder, ListServersResponseDecoder, ListServersResponseEncoder,
+    PutBucketResponseDecoder, PutBucketResponseEncoder, PutDeviceResponseDecoder,
+    PutDeviceResponseEncoder, PutServerResponseDecoder, PutServerResponseEncoder,
+};
 use Result;
 
 /// サーバ一覧取得RPC。
@@ -24,8 +34,8 @@ impl Call for ListServersRpc {
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<Vec<ServerSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ListServersResponseDecoder;
+    type ResEncoder = ListServersResponseEncoder;
 }
 
 /// サーバ情報取得RPC。
@@ -40,8 +50,8 @@ impl Call for GetServerRpc {
     type ReqEncoder = ServerIdEncoder;
 
     type Res = Result<Option<Server>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = GetServerResponseDecoder;
+    type ResEncoder = GetServerResponseEncoder;
 }
 
 /// サーバ登録RPC。
@@ -56,8 +66,8 @@ impl Call for PutServerRpc {
     type ReqEncoder = ServerEncoder;
 
     type Res = Result<Server>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = PutServerResponseDecoder;
+    type ResEncoder = PutServerResponseEncoder;
 }
 
 /// サーバ削除RPC。
@@ -72,8 +82,8 @@ impl Call for DeleteServerRpc {
     type ReqEncoder = ServerIdEncoder;
 
     type Res = Result<Option<Server>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = DeleteServerResponseDecoder;
+    type ResEncoder = DeleteServerResponseEncoder;
 }
 
 /// デバイス一覧取得RPC。
@@ -88,8 +98,8 @@ impl Call for ListDevicesRpc {
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<Vec<DeviceSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ListDevicesResponseDecoder;
+    type ResEncoder = ListDevicesResponseEncoder;
 }
 
 /// デバイス情報取得RPC。
@@ -104,8 +114,8 @@ impl Call for GetDeviceRpc {
     type ReqEncoder = DeviceIdEncoder;
 
     type Res = Result<Option<Device>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = GetDeviceResponseDecoder;
+    type ResEncoder = GetDeviceResponseEncoder;
 }
 
 /// デバイス登録RPC。
@@ -120,8 +130,8 @@ impl Call for PutDeviceRpc {
     type ReqEncoder = DeviceEncoder;
 
     type Res = Result<Device>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = PutDeviceResponseDecoder;
+    type ResEncoder = PutDeviceResponseEncoder;
 }
 
 /// デバイス削除RPC。
@@ -136,8 +146,8 @@ impl Call for DeleteDeviceRpc {
     type ReqEncoder = DeviceIdEncoder;
 
     type Res = Result<Option<Device>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = DeleteDeviceResponseDecoder;
+    type ResEncoder = DeleteDeviceResponseEncoder;
 }
 
 /// バケツ一覧取得RPC。
@@ -152,8 +162,8 @@ impl Call for ListBucketsRpc {
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<Vec<BucketSummary>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = ListBucketsResponseDecoder;
+    type ResEncoder = ListBucketsResponseEncoder;
 }
 
 /// バケツ情報取得RPC。
@@ -168,8 +178,8 @@ impl Call for GetBucketRpc {
     type ReqEncoder = BucketIdEncoder;
 
     type Res = Result<Option<Bucket>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = GetBucketResponseDecoder;
+    type ResEncoder = GetBucketResponseEncoder;
 }
 
 /// バケツ登録RPC。
@@ -184,8 +194,8 @@ impl Call for PutBucketRpc {
     type ReqEncoder = BucketEncoder;
 
     type Res = Result<Bucket>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = PutBucketResponseDecoder;
+    type ResEncoder = PutBucketResponseEncoder;
 }
 
 /// バケツ削除RPC。
@@ -200,8 +210,8 @@ impl Call for DeleteBucketRpc {
     type ReqEncoder = BucketIdEncoder;
 
     type Res = Result<Option<Bucket>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = DeleteBucketResponseDecoder;
+    type ResEncoder = DeleteBucketResponseEncoder;
 }
 
 /// Raftのリーダノード取得RPC。
@@ -217,6 +227,6 @@ impl Call for GetLeaderRpc {
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<SocketAddr>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResDecoder = BincodeDecoder<Self::Res>; // TODO
     type ResEncoder = BincodeEncoder<Self::Res>;
 }

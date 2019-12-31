@@ -76,11 +76,6 @@ impl<E: MessageEncode> ::bytecodec::Encode for VecEncoder<E> {
     }
 }
 impl<E: MessageEncode> ::protobuf_codec::message::MessageEncode for VecEncoder<E> {}
-//impl<E: MessageEncode + SizedEncode> ::bytecodec::SizedEncode for VecEncoder<E> {
-//    fn exact_requiring_bytes(&self) -> u64 {
-//        self.inner.exact_requiring_bytes()
-//    }
-//}
 
 /// Decoder for `Option`.
 #[derive(Debug, Default)]
