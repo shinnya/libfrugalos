@@ -12,19 +12,22 @@ use protobuf_codec::scalar::{
     Uint32Decoder, Uint32Encoder,
 };
 
-use entity::object::ObjectVersion;
+use entity::object::{FragmentsSummary, ObjectVersion};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::deadline::{decode_deadline, encode_deadline, DeadlineDecoder, DeadlineEncoder};
 use protobuf::entity::bucket::{BucketIdDecoder, BucketIdEncoder};
 use protobuf::entity::object::{
-    ObjectIdDecoder, ObjectIdEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
-    ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder,
+    FragmentsSummaryDecoder, FragmentsSummaryEncoder, ObjectIdDecoder, ObjectIdEncoder,
+    ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder, ObjectRangeEncoder,
+    ObjectVersionDecoder, ObjectVersionEncoder,
 };
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
+use protobuf::{OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder};
 use schema::frugalos::{
     CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, PrefixRequest,
     PutObjectRequest, RangeRequest, SegmentRequest, VersionRequest,
 };
+use Result;
 
 /// Decoder for `ObjectRequest`.
 #[derive(Debug, Default)]
@@ -453,3 +456,125 @@ pub struct SegmentRequestEncoder {
 impl_sized_message_encode!(SegmentRequestEncoder, SegmentRequest, |t: Self::Item| {
     (t.bucket_id, t.segment as u32)
 });
+
+/// Decoder for a response of `GetObject`.
+#[derive(Debug, Default)]
+pub struct GetObjectResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<
+            F1,
+            ResultDecoder<
+                OptionDecoder<
+                    MessageDecoder<
+                        Fields<(
+                            MaybeDefault<FieldDecoder<F1, ObjectVersionDecoder>>,
+                            MaybeDefault<FieldDecoder<F2, BytesDecoder>>,
+                        )>,
+                    >,
+                >,
+            >,
+        >,
+    >,
+}
+impl_message_decode!(
+    GetObjectResponseDecoder,
+    Result<Option<(ObjectVersion, Vec<u8>)>>,
+    |r: Result<Option<(u64, Vec<u8>)>>| Ok(r.map(|v| v.map(|t| (ObjectVersion(t.0), t.1))))
+);
+
+/// Encoder for a response of `GetObject`.
+#[derive(Debug, Default)]
+pub struct GetObjectResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<
+            F1,
+            ResultEncoder<
+                OptionEncoder<
+                    MessageEncoder<
+                        Fields<(
+                            FieldEncoder<F1, ObjectVersionEncoder>,
+                            FieldEncoder<F2, BytesEncoder>,
+                        )>,
+                    >,
+                >,
+            >,
+        >,
+    >,
+}
+impl_message_encode!(
+    GetObjectResponseEncoder,
+    Result<Option<(ObjectVersion, Vec<u8>)>>,
+    |item: Self::Item| item.map(|v| v.map(|t| ((t.0).0, t.1)))
+);
+
+/// Decoder for a response of `PutObject`.
+#[derive(Debug, Default)]
+pub struct PutObjectResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<
+            F1,
+            ResultDecoder<
+                MessageDecoder<
+                    Fields<(
+                        MaybeDefault<FieldDecoder<F1, ObjectVersionDecoder>>,
+                        MaybeDefault<FieldDecoder<F2, BoolDecoder>>,
+                    )>,
+                >,
+            >,
+        >,
+    >,
+}
+impl_message_decode!(
+    PutObjectResponseDecoder,
+    Result<(ObjectVersion, bool)>,
+    |r: Result<(u64, bool)>| Ok(r.map(|t| (ObjectVersion(t.0), t.1)))
+);
+
+/// Encoder for a response of `PutObject`.
+#[derive(Debug, Default)]
+pub struct PutObjectResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<
+            F1,
+            ResultEncoder<
+                MessageEncoder<
+                    Fields<(
+                        FieldEncoder<F1, ObjectVersionEncoder>,
+                        FieldEncoder<F2, BoolEncoder>,
+                    )>,
+                >,
+            >,
+        >,
+    >,
+}
+impl_message_encode!(
+    PutObjectResponseEncoder,
+    Result<(ObjectVersion, bool)>,
+    |item: Self::Item| item.map(|t| ((t.0).0, t.1))
+);
+
+/// Decoder for a response of `CountFragments`.
+#[derive(Debug, Default)]
+pub struct CountFragmentsResponseDecoder {
+    inner: MessageDecoder<
+        MessageFieldDecoder<F1, ResultDecoder<OptionDecoder<FragmentsSummaryDecoder>>>,
+    >,
+}
+impl_message_decode!(
+    CountFragmentsResponseDecoder,
+    Result<Option<FragmentsSummary>>,
+    |r: Result<Option<FragmentsSummary>>| Ok(r)
+);
+
+/// Encoder for a response of `CountFragments`.
+#[derive(Debug, Default)]
+pub struct CountFragmentsResponseEncoder {
+    inner: MessageEncoder<
+        MessageFieldEncoder<F1, ResultEncoder<OptionEncoder<FragmentsSummaryEncoder>>>,
+    >,
+}
+impl_sized_message_encode!(
+    CountFragmentsResponseEncoder,
+    Result<Option<FragmentsSummary>>,
+    |item: Self::Item| item
+);

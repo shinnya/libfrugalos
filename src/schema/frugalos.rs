@@ -15,12 +15,13 @@ use entity::object::{
 };
 use expect::Expect;
 use multiplicity::MultiplicityConfig;
-use protobuf::entity::object::{FragmentsSummaryDecoder, FragmentsSummaryEncoder};
 use protobuf::schema::frugalos::{
-    CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, HeadObjectRequestDecoder,
-    HeadObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder,
-    ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
-    PutObjectRequestDecoder, PutObjectRequestEncoder, RangeRequestDecoder, RangeRequestEncoder,
+    CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, CountFragmentsResponseDecoder,
+    CountFragmentsResponseEncoder, GetObjectResponseDecoder, GetObjectResponseEncoder,
+    HeadObjectRequestDecoder, HeadObjectRequestEncoder, ListObjectsRequestDecoder,
+    ListObjectsRequestEncoder, ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder,
+    PrefixRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder,
+    PutObjectResponseDecoder, PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
     SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
 };
 use protobuf::schema::object::{
@@ -29,7 +30,7 @@ use protobuf::schema::object::{
     MaybeObjectVersionResponseDecoder, MaybeObjectVersionResponseEncoder,
     ObjectSummarySequenceResponseDecoder, ObjectSummarySequenceResponseEncoder,
 };
-use protobuf::{OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder};
+use protobuf::{ResultDecoder, ResultEncoder};
 use repair::RepairConfig;
 use Result;
 
@@ -46,8 +47,8 @@ impl Call for GetObjectRpc {
 
     // FIXME: データが巨大になる可能性があるのでbincodeはやめる
     type Res = Result<Option<(ObjectVersion, Vec<u8>)>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = GetObjectResponseDecoder;
+    type ResEncoder = GetObjectResponseEncoder;
 }
 
 /// オブジェクト存在確認RPC。
@@ -79,8 +80,8 @@ impl Call for PutObjectRpc {
     type ReqEncoder = PutObjectRequestEncoder;
 
     type Res = Result<(ObjectVersion, bool)>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = PutObjectResponseDecoder;
+    type ResEncoder = PutObjectResponseEncoder;
 }
 
 /// オブジェクト削除RPC。
@@ -241,8 +242,8 @@ impl Call for CountFragmentsRpc {
     type ReqEncoder = CountFragmentsRequestEncoder;
 
     type Res = Result<Option<FragmentsSummary>>;
-    type ResDecoder = ResultDecoder<OptionDecoder<FragmentsSummaryDecoder>>;
-    type ResEncoder = ResultEncoder<OptionEncoder<FragmentsSummaryEncoder>>;
+    type ResDecoder = CountFragmentsResponseDecoder;
+    type ResEncoder = CountFragmentsResponseEncoder;
 }
 
 /// オブジェクト単位のRPC要求。
