@@ -13,6 +13,7 @@ use protobuf_codec::scalar::{
     DoubleDecoder, DoubleEncoder, StringDecoder, StringEncoder, Uint32Decoder, Uint32Encoder,
     Uint64Decoder, Uint64Encoder,
 };
+use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use std::borrow::ToOwned;
 use std::collections::BTreeSet;
 use std::path::PathBuf;
@@ -122,7 +123,7 @@ impl_message_encode!(DeviceEncoder, Device, |item: Self::Item| match item {
 pub struct WeightDecoder {
     inner: MessageDecoder<
         Oneof<(
-            FieldDecoder<F1, Uint32Decoder>,
+            MessageFieldDecoder<F1, EmptyMessageDecoder>,
             FieldDecoder<F2, Uint64Decoder>,
             FieldDecoder<F3, DoubleDecoder>,
         )>,
@@ -142,7 +143,7 @@ impl_message_decode!(WeightDecoder, Weight, |t: _| {
 pub struct WeightEncoder {
     inner: MessageEncoder<
         Oneof<(
-            FieldEncoder<F1, Uint32Encoder>,
+            MessageFieldEncoder<F1, EmptyMessageEncoder>,
             FieldEncoder<F2, Uint64Encoder>,
             FieldEncoder<F3, DoubleEncoder>,
         )>,
@@ -150,7 +151,7 @@ pub struct WeightEncoder {
 }
 
 impl_sized_message_encode!(WeightEncoder, Weight, |item: Self::Item| match item {
-    Weight::Auto => Branch3::A(0),
+    Weight::Auto => Branch3::A(()),
     Weight::Absolute(n) => Branch3::B(n),
     Weight::Relative(n) => Branch3::C(n),
 });
