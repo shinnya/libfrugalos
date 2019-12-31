@@ -502,7 +502,7 @@ pub struct GetObjectResponseEncoder {
         >,
     >,
 }
-impl_message_encode!(
+impl_sized_message_encode!(
     GetObjectResponseEncoder,
     Result<Option<(ObjectVersion, Vec<u8>)>>,
     |item: Self::Item| item.map(|v| v.map(|t| ((t.0).0, t.1)))
@@ -548,7 +548,7 @@ pub struct PutObjectResponseEncoder {
         >,
     >,
 }
-impl_message_encode!(
+impl_sized_message_encode!(
     PutObjectResponseEncoder,
     Result<(ObjectVersion, bool)>,
     |item: Self::Item| item.map(|t| ((t.0).0, t.1))
