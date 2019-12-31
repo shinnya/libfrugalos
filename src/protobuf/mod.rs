@@ -16,6 +16,7 @@ pub mod deadline;
 pub mod entity;
 pub mod error;
 pub mod expect;
+pub mod net;
 pub mod schema;
 
 // TODO Vec を汎用化する

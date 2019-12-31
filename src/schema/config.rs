@@ -1,5 +1,4 @@
 //! 構成管理系RPCのスキーマ定義。
-use bytecodec::bincode_codec::{BincodeDecoder, BincodeEncoder};
 use fibers_rpc::{Call, ProcedureId};
 use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use std::net::SocketAddr;
@@ -14,11 +13,12 @@ use protobuf::schema::config::{
     DeleteBucketResponseDecoder, DeleteBucketResponseEncoder, DeleteDeviceResponseDecoder,
     DeleteDeviceResponseEncoder, DeleteServerResponseDecoder, DeleteServerResponseEncoder,
     GetBucketResponseDecoder, GetBucketResponseEncoder, GetDeviceResponseDecoder,
-    GetDeviceResponseEncoder, GetServerResponseDecoder, GetServerResponseEncoder,
-    ListBucketsResponseDecoder, ListBucketsResponseEncoder, ListDevicesResponseDecoder,
-    ListDevicesResponseEncoder, ListServersResponseDecoder, ListServersResponseEncoder,
-    PutBucketResponseDecoder, PutBucketResponseEncoder, PutDeviceResponseDecoder,
-    PutDeviceResponseEncoder, PutServerResponseDecoder, PutServerResponseEncoder,
+    GetDeviceResponseEncoder, GetLeaderResponseDecoder, GetLeaderResponseEncoder,
+    GetServerResponseDecoder, GetServerResponseEncoder, ListBucketsResponseDecoder,
+    ListBucketsResponseEncoder, ListDevicesResponseDecoder, ListDevicesResponseEncoder,
+    ListServersResponseDecoder, ListServersResponseEncoder, PutBucketResponseDecoder,
+    PutBucketResponseEncoder, PutDeviceResponseDecoder, PutDeviceResponseEncoder,
+    PutServerResponseDecoder, PutServerResponseEncoder,
 };
 use Result;
 
@@ -227,6 +227,6 @@ impl Call for GetLeaderRpc {
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<SocketAddr>;
-    type ResDecoder = BincodeDecoder<Self::Res>; // TODO
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = GetLeaderResponseDecoder;
+    type ResEncoder = GetLeaderResponseEncoder;
 }

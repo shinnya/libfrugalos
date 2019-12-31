@@ -4,6 +4,7 @@ use bytecodec::combinator::PreEncode;
 use protobuf_codec::field::num::F1;
 use protobuf_codec::field::{MessageFieldDecoder, MessageFieldEncoder};
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
+use std::net::SocketAddr;
 
 use entity::bucket::{Bucket, BucketSummary};
 use entity::device::{Device, DeviceSummary};
@@ -17,6 +18,7 @@ use protobuf::entity::device::{
 use protobuf::entity::server::{
     ServerDecoder, ServerEncoder, ServerSummaryDecoder, ServerSummaryEncoder,
 };
+use protobuf::net::{SocketAddrDecoder, SocketAddrEncoder};
 use protobuf::{
     OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder, VecDecoder, VecEncoder,
 };
@@ -271,5 +273,23 @@ pub struct DeleteBucketResponseEncoder {
 impl_sized_message_encode!(
     DeleteBucketResponseEncoder,
     Result<Option<Bucket>>,
+    |item: Self::Item| item
+);
+
+/// Decoder for `GetLeader`.
+#[derive(Debug, Default)]
+pub struct GetLeaderResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<SocketAddrDecoder>>>,
+}
+impl_message_decode!(GetLeaderResponseDecoder, Result<SocketAddr>, |t: _| Ok(t));
+
+/// Encoder for `GetLeader`.
+#[derive(Debug, Default)]
+pub struct GetLeaderResponseEncoder {
+    inner: MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<SocketAddrEncoder>>>,
+}
+impl_sized_message_encode!(
+    GetLeaderResponseEncoder,
+    Result<SocketAddr>,
     |item: Self::Item| item
 );
