@@ -1,6 +1,7 @@
 //! 構成管理系RPCのスキーマ定義。
 use bytecodec::bincode_codec::{BincodeDecoder, BincodeEncoder};
 use fibers_rpc::{Call, ProcedureId};
+use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use std::net::SocketAddr;
 
 use entity::bucket::{Bucket, BucketId, BucketSummary};
@@ -9,7 +10,6 @@ use entity::server::{Server, ServerId, ServerSummary};
 use protobuf::entity::bucket::{BucketDecoder, BucketEncoder, BucketIdDecoder, BucketIdEncoder};
 use protobuf::entity::device::{DeviceDecoder, DeviceEncoder, DeviceIdDecoder, DeviceIdEncoder};
 use protobuf::entity::server::{ServerDecoder, ServerEncoder, ServerIdDecoder, ServerIdEncoder};
-use protobuf::{UnitDecoder, UnitEncoder};
 use Result;
 
 /// サーバ一覧取得RPC。
@@ -20,8 +20,8 @@ impl Call for ListServersRpc {
     const NAME: &'static str = "frugalos.config.server.list";
 
     type Req = ();
-    type ReqDecoder = UnitDecoder;
-    type ReqEncoder = UnitEncoder;
+    type ReqDecoder = EmptyMessageDecoder;
+    type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<Vec<ServerSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -84,8 +84,8 @@ impl Call for ListDevicesRpc {
     const NAME: &'static str = "frugalos.config.device.list";
 
     type Req = ();
-    type ReqDecoder = UnitDecoder;
-    type ReqEncoder = UnitEncoder;
+    type ReqDecoder = EmptyMessageDecoder;
+    type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<Vec<DeviceSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -148,8 +148,8 @@ impl Call for ListBucketsRpc {
     const NAME: &'static str = "frugalos.config.bucket.list";
 
     type Req = ();
-    type ReqDecoder = UnitDecoder;
-    type ReqEncoder = UnitEncoder;
+    type ReqDecoder = EmptyMessageDecoder;
+    type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<Vec<BucketSummary>>;
     type ResDecoder = BincodeDecoder<Self::Res>;
@@ -213,8 +213,8 @@ impl Call for GetLeaderRpc {
     const NAME: &'static str = "frugalos.config.leader.get";
 
     type Req = ();
-    type ReqDecoder = UnitDecoder;
-    type ReqEncoder = UnitEncoder;
+    type ReqDecoder = EmptyMessageDecoder;
+    type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<SocketAddr>;
     type ResDecoder = BincodeDecoder<Self::Res>;

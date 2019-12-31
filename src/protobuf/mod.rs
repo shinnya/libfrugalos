@@ -4,7 +4,7 @@ use bytecodec::combinator::PreEncode;
 use bytecodec::SizedEncode;
 use protobuf_codec::field::branch::Branch2;
 use protobuf_codec::field::num::{F1, F2};
-use protobuf_codec::field::{Fields, MessageFieldDecoder, MessageFieldEncoder, Oneof};
+use protobuf_codec::field::{MessageFieldDecoder, MessageFieldEncoder, Oneof};
 use protobuf_codec::message::{MessageDecode, MessageDecoder, MessageEncode, MessageEncoder};
 use trackable::error::ErrorKindExt;
 
@@ -17,20 +17,6 @@ pub mod entity;
 pub mod error;
 pub mod expect;
 pub mod schema;
-
-/// Decoder for `()`.
-#[derive(Debug, Default)]
-pub struct UnitDecoder {
-    inner: MessageDecoder<Fields<()>>,
-}
-impl_message_decode!(UnitDecoder, (), |t: _| Ok(t));
-
-/// Encoder for `()`.
-#[derive(Debug, Default)]
-pub struct UnitEncoder {
-    inner: MessageEncoder<Fields<()>>,
-}
-impl_sized_message_encode!(UnitEncoder, (), |item: Self::Item| item);
 
 /// Decoder for `Result`.
 #[derive(Debug, Default)]
