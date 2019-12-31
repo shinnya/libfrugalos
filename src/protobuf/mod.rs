@@ -1,22 +1,20 @@
 //! Encoders and decoders of Protocol Buffers.
 
+use bytecodec::combinator::PreEncode;
 use bytecodec::SizedEncode;
 use protobuf_codec::field::branch::Branch2;
 use protobuf_codec::field::num::{F1, F2};
-use protobuf_codec::field::{
-    FieldDecoder, Fields, MessageFieldDecoder, MessageFieldEncoder, Oneof,
-};
-use protobuf_codec::message::{MessageDecode, MessageEncode};
-use protobuf_codec::message::{MessageDecoder, MessageEncoder};
-use protobuf_codec::wellknown::protobuf_codec::protobuf::trackable::{ErrorDecoder, ErrorEncoder};
-use std::marker::PhantomData;
+use protobuf_codec::field::{Fields, MessageFieldDecoder, MessageFieldEncoder, Oneof};
+use protobuf_codec::message::{MessageDecode, MessageDecoder, MessageEncode, MessageEncoder};
 use trackable::error::ErrorKindExt;
 
+use protobuf::error::{ErrorDecoder, ErrorEncoder};
 use {ErrorKind, Result};
 
 pub mod consistency;
 pub mod deadline;
 pub mod entity;
+pub mod error;
 pub mod expect;
 pub mod schema;
 
@@ -54,6 +52,7 @@ impl<D: MessageDecode> ::bytecodec::Decode for ResultDecoder<D> {
     fn finish_decoding(&mut self) -> ::bytecodec::Result<Self::Item> {
         match track!(self.inner.finish_decoding())? {
             Branch2::A(value) => Ok(Ok(value)),
+            // TODO InvalidInput 再検討
             Branch2::B(e) => Ok(track!(Err(ErrorKind::InvalidInput.takes_over(e).into()))),
         }
     }
@@ -74,7 +73,7 @@ pub struct ResultEncoder<E: MessageEncode + SizedEncode> {
     inner: MessageEncoder<
         Oneof<(
             MessageFieldEncoder<F1, E>,
-            MessageFieldEncoder<F2, ErrorEncoder>,
+            MessageFieldEncoder<F2, PreEncode<ErrorEncoder>>,
         )>,
     >,
 }
@@ -88,7 +87,10 @@ impl<E: MessageEncode + SizedEncode> ::bytecodec::Encode for ResultEncoder<E> {
     fn start_encoding(&mut self, item: Self::Item) -> ::bytecodec::Result<()> {
         let item = match item {
             Ok(x) => Branch2::A(x),
-            Err(e) => Branch2::B(e),
+            Err(e) => {
+                // TODO InvalidInput 再検討
+                Branch2::B(ErrorKind::InvalidInput.takes_over(e))
+            }
         };
         track!(self.inner.start_encoding(item))
     }
