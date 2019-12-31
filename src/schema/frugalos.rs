@@ -22,7 +22,9 @@ use protobuf::schema::frugalos::{
     ListObjectsRequestEncoder, ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder,
     PrefixRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder,
     PutObjectResponseDecoder, PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
-    SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
+    SegmentRequestDecoder, SegmentRequestEncoder, StopResponseDecoder, StopResponseEncoder,
+    TakeSnapshotResponseDecoder, TakeSnapshotResponseEncoder, VersionRequestDecoder,
+    VersionRequestEncoder,
 };
 use protobuf::schema::object::{
     DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
@@ -30,7 +32,6 @@ use protobuf::schema::object::{
     MaybeObjectVersionResponseDecoder, MaybeObjectVersionResponseEncoder,
     ObjectSummarySequenceResponseDecoder, ObjectSummarySequenceResponseEncoder,
 };
-use protobuf::{ResultDecoder, ResultEncoder};
 use repair::RepairConfig;
 use Result;
 
@@ -360,12 +361,12 @@ impl Call for StopRpc {
     const NAME: &'static str = "frugalos.ctrl.stop";
 
     type Req = ();
-    type ReqDecoder = EmptyMessageDecoder;
+    type ReqDecoder = EmptyMessageDecoder; // TODO use custom type
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<()>;
-    type ResDecoder = ResultDecoder<EmptyMessageDecoder>;
-    type ResEncoder = ResultEncoder<EmptyMessageEncoder>;
+    type ResDecoder = StopResponseDecoder;
+    type ResEncoder = StopResponseEncoder;
 }
 
 /// スナップショット取得RPC。
@@ -376,12 +377,12 @@ impl Call for TakeSnapshotRpc {
     const NAME: &'static str = "frugalos.ctrl.take_snapshot";
 
     type Req = ();
-    type ReqDecoder = EmptyMessageDecoder;
+    type ReqDecoder = EmptyMessageDecoder; // TODO use custom type
     type ReqEncoder = EmptyMessageEncoder;
 
     type Res = Result<()>;
-    type ResDecoder = ResultDecoder<EmptyMessageDecoder>;
-    type ResEncoder = ResultEncoder<EmptyMessageEncoder>;
+    type ResDecoder = TakeSnapshotResponseDecoder;
+    type ResEncoder = TakeSnapshotResponseEncoder;
 }
 
 /// An RPC for changing configuration of repair functionality.
@@ -392,7 +393,7 @@ impl Call for SetRepairConfigRpc {
     const NAME: &'static str = "frugalos.ctrl.set_repair_config";
 
     type Req = RepairConfig;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqEncoder = BincodeEncoder<Self::Req>; // TODO protobuf
     type ReqDecoder = BincodeDecoder<Self::Req>;
 
     type Res = Result<()>;

@@ -23,6 +23,7 @@ use protobuf::entity::object::{
 };
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use protobuf::{OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder};
+use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use schema::frugalos::{
     CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, PrefixRequest,
     PutObjectRequest, RangeRequest, SegmentRequest, VersionRequest,
@@ -576,5 +577,37 @@ pub struct CountFragmentsResponseEncoder {
 impl_sized_message_encode!(
     CountFragmentsResponseEncoder,
     Result<Option<FragmentsSummary>>,
+    |item: Self::Item| item
+);
+
+/// Decoder for a response of `Stop`.
+#[derive(Debug, Default)]
+pub struct StopResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<EmptyMessageDecoder>>>,
+}
+impl_message_decode!(StopResponseDecoder, Result<()>, |r: _| Ok(r));
+
+/// Encoder for a response of `Stop`.
+#[derive(Debug, Default)]
+pub struct StopResponseEncoder {
+    inner: MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<EmptyMessageEncoder>>>,
+}
+impl_sized_message_encode!(StopResponseEncoder, Result<()>, |item: Self::Item| item);
+
+/// Decoder for a response of `TakeSnapshot`.
+#[derive(Debug, Default)]
+pub struct TakeSnapshotResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<EmptyMessageDecoder>>>,
+}
+impl_message_decode!(TakeSnapshotResponseDecoder, Result<()>, |r: _| Ok(r));
+
+/// Encoder for a response of `TakeSnapshot`.
+#[derive(Debug, Default)]
+pub struct TakeSnapshotResponseEncoder {
+    inner: MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<EmptyMessageEncoder>>>,
+}
+impl_sized_message_encode!(
+    TakeSnapshotResponseEncoder,
+    Result<()>,
     |item: Self::Item| item
 );
