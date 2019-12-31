@@ -12,7 +12,7 @@ use protobuf_codec::scalar::{
 };
 use std::time::Duration;
 
-use entity::node::RemoteNodeId;
+use entity::node::{LocalNodeId, RemoteNodeId};
 use entity::object::{DeleteObjectsByPrefixSummary, Metadata, ObjectSummary, ObjectVersion};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::entity::node::{
@@ -29,10 +29,77 @@ use protobuf::{
     OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder, VecDecoder, VecEncoder,
 };
 use schema::mds::{
-    ListObjectsRequest, ObjectCountRequest, ObjectRequest, PrefixRequest, PutObjectRequest,
-    RangeRequest, VersionRequest,
+    GetLatestVersionRequest, GetLeaderRequest, ListObjectsRequest, ObjectCountRequest,
+    ObjectRequest, PrefixRequest, PutObjectRequest, RangeRequest, RecommendToLeaderRequest,
+    VersionRequest,
 };
 use Result;
+
+/// Decoder for `GetLeaderRequest`.
+#[derive(Debug, Default)]
+pub struct GetLeaderRequestDecoder {
+    inner: MessageDecoder<MaybeDefault<FieldDecoder<F1, LocalNodeIdDecoder>>>,
+}
+impl_message_decode!(
+    GetLeaderRequestDecoder,
+    GetLeaderRequest,
+    |t: LocalNodeId| { Ok(GetLeaderRequest { node_id: t.clone() }) }
+);
+
+/// Encoder for `GetLeaderRequest`.
+#[derive(Debug, Default)]
+pub struct GetLeaderRequestEncoder {
+    inner: MessageEncoder<FieldEncoder<F1, LocalNodeIdEncoder>>,
+}
+impl_sized_message_encode!(
+    GetLeaderRequestEncoder,
+    GetLeaderRequest,
+    |item: Self::Item| item.node_id
+);
+
+/// Decoder for `RecommendToLeaderRequest`.
+#[derive(Debug, Default)]
+pub struct RecommendToLeaderRequestDecoder {
+    inner: MessageDecoder<MaybeDefault<FieldDecoder<F1, LocalNodeIdDecoder>>>,
+}
+impl_message_decode!(
+    RecommendToLeaderRequestDecoder,
+    RecommendToLeaderRequest,
+    |t: LocalNodeId| { Ok(RecommendToLeaderRequest { node_id: t.clone() }) }
+);
+
+/// Encoder for `RecommendToLeaderRequest`.
+#[derive(Debug, Default)]
+pub struct RecommendToLeaderRequestEncoder {
+    inner: MessageEncoder<FieldEncoder<F1, LocalNodeIdEncoder>>,
+}
+impl_sized_message_encode!(
+    RecommendToLeaderRequestEncoder,
+    RecommendToLeaderRequest,
+    |item: Self::Item| item.node_id
+);
+
+/// Decoder for `GetLatestVersionRequest`.
+#[derive(Debug, Default)]
+pub struct GetLatestVersionRequestDecoder {
+    inner: MessageDecoder<MaybeDefault<FieldDecoder<F1, LocalNodeIdDecoder>>>,
+}
+impl_message_decode!(
+    GetLatestVersionRequestDecoder,
+    GetLatestVersionRequest,
+    |t: LocalNodeId| { Ok(GetLatestVersionRequest { node_id: t.clone() }) }
+);
+
+/// Encoder for `GetLatestVersionRequest`.
+#[derive(Debug, Default)]
+pub struct GetLatestVersionRequestEncoder {
+    inner: MessageEncoder<FieldEncoder<F1, LocalNodeIdEncoder>>,
+}
+impl_sized_message_encode!(
+    GetLatestVersionRequestEncoder,
+    GetLatestVersionRequest,
+    |item: Self::Item| item.node_id
+);
 
 /// Decoder for `ObjectRequest`.
 #[derive(Debug, Default)]

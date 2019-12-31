@@ -1,5 +1,4 @@
 //! MDS系RPCのスキーマ定義。
-use bytecodec::bincode_codec::{BincodeDecoder, BincodeEncoder};
 use fibers_rpc::{Call, Cast, ProcedureId};
 use std::ops::Range;
 use std::time::Duration;
@@ -12,16 +11,19 @@ use entity::object::{
 use expect::Expect;
 use protobuf::schema::mds::{
     DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
-    GetLeaderResponseDecoder, GetLeaderResponseEncoder, ListObjectsRequestDecoder,
-    ListObjectsRequestEncoder, MaybeMetadataResponseDecoder, MaybeMetadataResponseEncoder,
-    MaybeObjectSummaryResponseDecoder, MaybeObjectSummaryResponseEncoder,
-    MaybeObjectVersionResponseDecoder, MaybeObjectVersionResponseEncoder,
-    ObjectCountRequestDecoder, ObjectCountRequestEncoder, ObjectCountResponseDecoder,
-    ObjectCountResponseEncoder, ObjectRequestDecoder, ObjectRequestEncoder,
-    ObjectSummarySequenceResponseDecoder, ObjectSummarySequenceResponseEncoder,
-    PrefixRequestDecoder, PrefixRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder,
-    PutObjectResponseDecoder, PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
-    VersionRequestDecoder, VersionRequestEncoder,
+    GetLatestVersionRequestDecoder, GetLatestVersionRequestEncoder, GetLeaderRequestDecoder,
+    GetLeaderRequestEncoder, GetLeaderResponseDecoder, GetLeaderResponseEncoder,
+    ListObjectsRequestDecoder, ListObjectsRequestEncoder, MaybeMetadataResponseDecoder,
+    MaybeMetadataResponseEncoder, MaybeObjectSummaryResponseDecoder,
+    MaybeObjectSummaryResponseEncoder, MaybeObjectVersionResponseDecoder,
+    MaybeObjectVersionResponseEncoder, ObjectCountRequestDecoder, ObjectCountRequestEncoder,
+    ObjectCountResponseDecoder, ObjectCountResponseEncoder, ObjectRequestDecoder,
+    ObjectRequestEncoder, ObjectSummarySequenceResponseDecoder,
+    ObjectSummarySequenceResponseEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
+    PutObjectRequestDecoder, PutObjectRequestEncoder, PutObjectResponseDecoder,
+    PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
+    RecommendToLeaderRequestDecoder, RecommendToLeaderRequestEncoder, VersionRequestDecoder,
+    VersionRequestEncoder,
 };
 use Result;
 
@@ -32,9 +34,9 @@ impl Call for GetLeaderRpc {
     const ID: ProcedureId = ProcedureId(0x0007_0000);
     const NAME: &'static str = "frugalos.mds.leader.get";
 
-    type Req = LocalNodeId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type Req = GetLeaderRequest;
+    type ReqDecoder = GetLeaderRequestDecoder;
+    type ReqEncoder = GetLeaderRequestEncoder;
 
     type Res = Result<RemoteNodeId>;
     type ResDecoder = GetLeaderResponseDecoder;
@@ -48,9 +50,9 @@ impl Cast for RecommendToLeaderRpc {
     const ID: ProcedureId = ProcedureId(0x0007_0001);
     const NAME: &'static str = "frugalos.mds.leader.recommend";
 
-    type Notification = LocalNodeId;
-    type Decoder = BincodeDecoder<Self::Notification>;
-    type Encoder = BincodeEncoder<Self::Notification>;
+    type Notification = RecommendToLeaderRequest;
+    type Decoder = RecommendToLeaderRequestDecoder;
+    type Encoder = RecommendToLeaderRequestEncoder;
 }
 
 /// オブジェクト一覧取得RPC。
@@ -144,9 +146,9 @@ impl Call for GetLatestVersionRpc {
     const ID: ProcedureId = ProcedureId(0x0008_0005);
     const NAME: &'static str = "frugalos.mds.object.latest_version";
 
-    type Req = LocalNodeId;
-    type ReqDecoder = BincodeDecoder<Self::Req>;
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type Req = GetLatestVersionRequest;
+    type ReqDecoder = GetLatestVersionRequestDecoder;
+    type ReqEncoder = GetLatestVersionRequestEncoder;
 
     type Res = Result<Option<ObjectSummary>>;
     type ResDecoder = MaybeObjectSummaryResponseDecoder;
@@ -235,6 +237,27 @@ impl Call for ListObjectsByPrefixRpc {
     fn enable_async_response(_: &Self::Res) -> bool {
         true
     }
+}
+
+/// リーダー取得要求。
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetLeaderRequest {
+    pub node_id: LocalNodeId,
+}
+
+/// リーダー再選挙要求。
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RecommendToLeaderRequest {
+    pub node_id: LocalNodeId,
+}
+
+/// 最新バージョン取得要求。
+#[allow(missing_docs)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GetLatestVersionRequest {
+    pub node_id: LocalNodeId,
 }
 
 /// オブジェクト単位の要求。
