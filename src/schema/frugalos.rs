@@ -15,10 +15,7 @@ use entity::object::{
 };
 use expect::Expect;
 use multiplicity::MultiplicityConfig;
-use protobuf::entity::object::{
-    DeleteObjectsByPrefixSummaryDecoder, DeleteObjectsByPrefixSummaryEncoder,
-    FragmentsSummaryDecoder, FragmentsSummaryEncoder, ObjectSummaryDecoder, ObjectSummaryEncoder,
-};
+use protobuf::entity::object::{FragmentsSummaryDecoder, FragmentsSummaryEncoder};
 use protobuf::schema::frugalos::{
     CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, HeadObjectRequestDecoder,
     HeadObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder,
@@ -26,9 +23,13 @@ use protobuf::schema::frugalos::{
     PutObjectRequestDecoder, PutObjectRequestEncoder, RangeRequestDecoder, RangeRequestEncoder,
     SegmentRequestDecoder, SegmentRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
 };
-use protobuf::{
-    OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder, VecDecoder, VecEncoder,
+use protobuf::schema::object::{
+    DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
+    MaybeObjectSummaryResponseDecoder, MaybeObjectSummaryResponseEncoder,
+    MaybeObjectVersionResponseDecoder, MaybeObjectVersionResponseEncoder,
+    ObjectSummarySequenceResponseDecoder, ObjectSummarySequenceResponseEncoder,
 };
+use protobuf::{OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder};
 use repair::RepairConfig;
 use Result;
 
@@ -61,8 +62,8 @@ impl Call for HeadObjectRpc {
     type ReqEncoder = HeadObjectRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectVersionResponseDecoder;
+    type ResEncoder = MaybeObjectVersionResponseEncoder;
 }
 
 /// オブジェクト保存RPC。
@@ -94,8 +95,8 @@ impl Call for DeleteObjectRpc {
     type ReqEncoder = ObjectRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectVersionResponseDecoder;
+    type ResEncoder = MaybeObjectVersionResponseEncoder;
 }
 
 /// オブジェクト一覧取得RPC。
@@ -110,8 +111,8 @@ impl Call for ListObjectsRpc {
     type ReqEncoder = ListObjectsRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = ResultDecoder<VecDecoder<ObjectSummaryDecoder>>;
-    type ResEncoder = ResultEncoder<VecEncoder<ObjectSummaryEncoder>>;
+    type ResDecoder = ObjectSummarySequenceResponseDecoder;
+    type ResEncoder = ObjectSummarySequenceResponseEncoder;
 
     fn enable_async_response(_: &Self::Res) -> bool {
         true
@@ -130,8 +131,8 @@ impl Call for GetLatestVersionRpc {
     type ReqEncoder = SegmentRequestEncoder;
 
     type Res = Result<Option<ObjectSummary>>;
-    type ResDecoder = ResultDecoder<OptionDecoder<ObjectSummaryDecoder>>;
-    type ResEncoder = ResultEncoder<OptionEncoder<ObjectSummaryEncoder>>;
+    type ResDecoder = MaybeObjectSummaryResponseDecoder;
+    type ResEncoder = MaybeObjectSummaryResponseEncoder;
 }
 
 /// バージョン指定でのオブジェクト削除RPC。
@@ -146,8 +147,8 @@ impl Call for DeleteObjectByVersionRpc {
     type ReqEncoder = VersionRequestEncoder;
 
     type Res = Result<Option<ObjectVersion>>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = MaybeObjectVersionResponseDecoder;
+    type ResEncoder = MaybeObjectVersionResponseEncoder;
 }
 
 /// バージョンの範囲指定でのオブジェクト削除RPC。
@@ -162,8 +163,8 @@ impl Call for DeleteObjectsByRangeRpc {
     type ReqEncoder = RangeRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = ResultDecoder<VecDecoder<ObjectSummaryDecoder>>;
-    type ResEncoder = ResultEncoder<VecEncoder<ObjectSummaryEncoder>>;
+    type ResDecoder = ObjectSummarySequenceResponseDecoder;
+    type ResEncoder = ObjectSummarySequenceResponseEncoder;
 
     /*
     NOTE:
@@ -188,8 +189,8 @@ impl Call for DeleteObjectsByPrefixRpc {
     type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<DeleteObjectsByPrefixSummary>;
-    type ResDecoder = ResultDecoder<DeleteObjectsByPrefixSummaryDecoder>;
-    type ResEncoder = ResultEncoder<DeleteObjectsByPrefixSummaryEncoder>;
+    type ResDecoder = DeleteObjectsByPrefixSummaryResponseDecoder;
+    type ResEncoder = DeleteObjectsByPrefixSummaryResponseEncoder;
 }
 
 /// An RPC for deleting objects physically.
@@ -220,8 +221,8 @@ impl Call for ListObjectsByPrefixRpc {
     type ReqEncoder = PrefixRequestEncoder;
 
     type Res = Result<Vec<ObjectSummary>>;
-    type ResDecoder = ResultDecoder<VecDecoder<ObjectSummaryDecoder>>;
-    type ResEncoder = ResultEncoder<VecEncoder<ObjectSummaryEncoder>>;
+    type ResDecoder = ObjectSummarySequenceResponseDecoder;
+    type ResEncoder = ObjectSummarySequenceResponseEncoder;
 
     fn enable_async_response(_: &Self::Res) -> bool {
         true

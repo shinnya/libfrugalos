@@ -10,20 +10,21 @@ use entity::object::{
 };
 use expect::Expect;
 use protobuf::schema::mds::{
-    DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
     GetLatestVersionRequestDecoder, GetLatestVersionRequestEncoder, GetLeaderRequestDecoder,
     GetLeaderRequestEncoder, GetLeaderResponseDecoder, GetLeaderResponseEncoder,
     ListObjectsRequestDecoder, ListObjectsRequestEncoder, MaybeMetadataResponseDecoder,
-    MaybeMetadataResponseEncoder, MaybeObjectSummaryResponseDecoder,
-    MaybeObjectSummaryResponseEncoder, MaybeObjectVersionResponseDecoder,
-    MaybeObjectVersionResponseEncoder, ObjectCountRequestDecoder, ObjectCountRequestEncoder,
+    MaybeMetadataResponseEncoder, ObjectCountRequestDecoder, ObjectCountRequestEncoder,
     ObjectCountResponseDecoder, ObjectCountResponseEncoder, ObjectRequestDecoder,
-    ObjectRequestEncoder, ObjectSummarySequenceResponseDecoder,
-    ObjectSummarySequenceResponseEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
-    PutObjectRequestDecoder, PutObjectRequestEncoder, PutObjectResponseDecoder,
-    PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
-    RecommendToLeaderRequestDecoder, RecommendToLeaderRequestEncoder, VersionRequestDecoder,
-    VersionRequestEncoder,
+    ObjectRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder, PutObjectRequestDecoder,
+    PutObjectRequestEncoder, PutObjectResponseDecoder, PutObjectResponseEncoder,
+    RangeRequestDecoder, RangeRequestEncoder, RecommendToLeaderRequestDecoder,
+    RecommendToLeaderRequestEncoder, VersionRequestDecoder, VersionRequestEncoder,
+};
+use protobuf::schema::object::{
+    DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
+    MaybeObjectSummaryResponseDecoder, MaybeObjectSummaryResponseEncoder,
+    MaybeObjectVersionResponseDecoder, MaybeObjectVersionResponseEncoder,
+    ObjectSummarySequenceResponseDecoder, ObjectSummarySequenceResponseEncoder,
 };
 use Result;
 

@@ -13,21 +13,17 @@ use protobuf_codec::scalar::{
 use std::time::Duration;
 
 use entity::node::{LocalNodeId, RemoteNodeId};
-use entity::object::{DeleteObjectsByPrefixSummary, Metadata, ObjectSummary, ObjectVersion};
+use entity::object::{Metadata, ObjectVersion};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::entity::node::{
     LocalNodeIdDecoder, LocalNodeIdEncoder, RemoteNodeIdDecoder, RemoteNodeIdEncoder,
 };
 use protobuf::entity::object::{
-    DeleteObjectsByPrefixSummaryDecoder, DeleteObjectsByPrefixSummaryEncoder, MetadataDecoder,
-    MetadataEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
-    ObjectRangeEncoder, ObjectSummaryDecoder, ObjectSummaryEncoder, ObjectVersionDecoder,
-    ObjectVersionEncoder,
+    MetadataDecoder, MetadataEncoder, ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder,
+    ObjectRangeEncoder, ObjectVersionDecoder, ObjectVersionEncoder,
 };
 use protobuf::expect::{ExpectDecoder, ExpectEncoder};
-use protobuf::{
-    OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder, VecDecoder, VecEncoder,
-};
+use protobuf::{OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder};
 use schema::mds::{
     GetLatestVersionRequest, GetLeaderRequest, ListObjectsRequest, ObjectCountRequest,
     ObjectRequest, PrefixRequest, PutObjectRequest, RangeRequest, RecommendToLeaderRequest,
@@ -382,30 +378,6 @@ impl_message_encode!(
     |item: Self::Item| item
 );
 
-/// Decoder for a response of `Vec<ObjectSummary>`.
-#[derive(Debug, Default)]
-pub struct ObjectSummarySequenceResponseDecoder {
-    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<VecDecoder<ObjectSummaryDecoder>>>>,
-}
-impl_message_decode!(
-    ObjectSummarySequenceResponseDecoder,
-    Result<Vec<ObjectSummary>>,
-    |t: _| Ok(t)
-);
-
-/// Encoder for a response of `Vec<ObjectSummary>`.
-#[derive(Debug, Default)]
-pub struct ObjectSummarySequenceResponseEncoder {
-    inner: MessageEncoder<
-        MessageFieldEncoder<F1, PreEncode<ResultEncoder<VecEncoder<ObjectSummaryEncoder>>>>,
-    >,
-}
-impl_message_encode!(
-    ObjectSummarySequenceResponseEncoder,
-    Result<Vec<ObjectSummary>>,
-    |item: Self::Item| item
-);
-
 /// Decoder for a response of `Option<Metadata>`.
 #[derive(Debug, Default)]
 pub struct MaybeMetadataResponseDecoder {
@@ -426,38 +398,6 @@ impl_message_encode!(
     MaybeMetadataResponseEncoder,
     Result<Option<Metadata>>,
     |item: Self::Item| item
-);
-
-/// Decoder for a response of `Option<ObjectVersion>`.
-#[derive(Debug, Default)]
-pub struct MaybeObjectVersionResponseDecoder {
-    inner: MessageDecoder<
-        MessageFieldDecoder<
-            F1,
-            ResultDecoder<OptionDecoder<MessageDecoder<FieldDecoder<F1, ObjectVersionDecoder>>>>,
-        >,
-    >,
-}
-impl_message_decode!(
-    MaybeObjectVersionResponseDecoder,
-    Result<Option<ObjectVersion>>,
-    |t: Result<Option<u64>>| Ok(t.map(|x| x.map(ObjectVersion)))
-);
-
-/// Encoder for a response of `Option<ObjectVersion>`.
-#[derive(Debug, Default)]
-pub struct MaybeObjectVersionResponseEncoder {
-    inner: MessageEncoder<
-        MessageFieldEncoder<
-            F1,
-            ResultEncoder<OptionEncoder<MessageEncoder<FieldEncoder<F1, ObjectVersionEncoder>>>>,
-        >,
-    >,
-}
-impl_message_encode!(
-    MaybeObjectVersionResponseEncoder,
-    Result<Option<ObjectVersion>>,
-    |item: Self::Item| item.map(|x| x.map(|v| v.0))
 );
 
 /// Decoder for a response of `PutObject`.
@@ -506,30 +446,6 @@ impl_message_encode!(
     |item: Self::Item| item.map(|t| ((t.0).0, t.1.map(|v| v.0)))
 );
 
-/// Decoder for a response of `Option<ObjectSummary>`.
-#[derive(Debug, Default)]
-pub struct MaybeObjectSummaryResponseDecoder {
-    inner:
-        MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<OptionDecoder<ObjectSummaryDecoder>>>>,
-}
-impl_message_decode!(
-    MaybeObjectSummaryResponseDecoder,
-    Result<Option<ObjectSummary>>,
-    |t: _| Ok(t)
-);
-
-/// Encoder for a response of `Option<ObjectSummary>`.
-#[derive(Debug, Default)]
-pub struct MaybeObjectSummaryResponseEncoder {
-    inner:
-        MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<OptionEncoder<ObjectSummaryEncoder>>>>,
-}
-impl_message_encode!(
-    MaybeObjectSummaryResponseEncoder,
-    Result<Option<ObjectSummary>>,
-    |item: Self::Item| item
-);
-
 /// Decoder for a response of `ObjectCount`.
 #[derive(Debug, Default)]
 pub struct ObjectCountResponseDecoder {
@@ -549,29 +465,5 @@ pub struct ObjectCountResponseEncoder {
 impl_message_encode!(
     ObjectCountResponseEncoder,
     Result<u64>,
-    |item: Self::Item| item
-);
-
-/// Decoder for a response of `DeleteObjectsByPrefixSummary`.
-#[derive(Debug, Default)]
-pub struct DeleteObjectsByPrefixSummaryResponseDecoder {
-    inner:
-        MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<DeleteObjectsByPrefixSummaryDecoder>>>,
-}
-impl_message_decode!(
-    DeleteObjectsByPrefixSummaryResponseDecoder,
-    Result<DeleteObjectsByPrefixSummary>,
-    |t: _| Ok(t)
-);
-
-/// Encoder for a response of `DeleteObjectsByPrefixSummary`.
-#[derive(Debug, Default)]
-pub struct DeleteObjectsByPrefixSummaryResponseEncoder {
-    inner:
-        MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<DeleteObjectsByPrefixSummaryEncoder>>>,
-}
-impl_message_encode!(
-    DeleteObjectsByPrefixSummaryResponseEncoder,
-    Result<DeleteObjectsByPrefixSummary>,
     |item: Self::Item| item
 );
