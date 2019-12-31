@@ -8,7 +8,12 @@ use std::net::SocketAddr;
 use std::str::FromStr;
 
 use entity::node::RemoteNodeId;
-//use ErrorKind;
+
+/// Decoder for [LocalNodeId].
+pub type LocalNodeIdDecoder = StringDecoder;
+
+/// Encoder for [LocalNodeId].
+pub type LocalNodeIdEncoder = StringEncoder;
 
 /// Decoder for `RemoteNodeId`.
 #[derive(Debug, Default)]
