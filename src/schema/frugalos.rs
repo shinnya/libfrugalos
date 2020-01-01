@@ -15,16 +15,17 @@ use entity::object::{
 };
 use expect::Expect;
 use multiplicity::MultiplicityConfig;
+use protobuf::repair::{RepairConfigDecoder, RepairConfigEncoder};
 use protobuf::schema::frugalos::{
     CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, CountFragmentsResponseDecoder,
-    CountFragmentsResponseEncoder, GetObjectResponseDecoder, GetObjectResponseEncoder,
-    HeadObjectRequestDecoder, HeadObjectRequestEncoder, ListObjectsRequestDecoder,
-    ListObjectsRequestEncoder, ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder,
-    PrefixRequestEncoder, PutObjectRequestDecoder, PutObjectRequestEncoder,
-    PutObjectResponseDecoder, PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder,
-    SegmentRequestDecoder, SegmentRequestEncoder, StopResponseDecoder, StopResponseEncoder,
-    TakeSnapshotResponseDecoder, TakeSnapshotResponseEncoder, VersionRequestDecoder,
-    VersionRequestEncoder,
+    CountFragmentsResponseEncoder, EmptyResponseDecoder, EmptyResponseEncoder,
+    GetObjectResponseDecoder, GetObjectResponseEncoder, HeadObjectRequestDecoder,
+    HeadObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder,
+    ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
+    PutObjectRequestDecoder, PutObjectRequestEncoder, PutObjectResponseDecoder,
+    PutObjectResponseEncoder, RangeRequestDecoder, RangeRequestEncoder, SegmentRequestDecoder,
+    SegmentRequestEncoder, StopResponseDecoder, StopResponseEncoder, TakeSnapshotResponseDecoder,
+    TakeSnapshotResponseEncoder, VersionRequestDecoder, VersionRequestEncoder,
 };
 use protobuf::schema::object::{
     DeleteObjectsByPrefixSummaryResponseDecoder, DeleteObjectsByPrefixSummaryResponseEncoder,
@@ -207,8 +208,8 @@ impl Call for DeleteObjectSetFromDeviceRpc {
     type ReqEncoder = BincodeEncoder<Self::Req>;
 
     type Res = Result<()>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
+    type ResDecoder = EmptyResponseDecoder;
+    type ResEncoder = EmptyResponseEncoder;
 }
 
 /// 接頭辞指定でのオブジェクト一覧取得RPC。
@@ -393,10 +394,10 @@ impl Call for SetRepairConfigRpc {
     const NAME: &'static str = "frugalos.ctrl.set_repair_config";
 
     type Req = RepairConfig;
-    type ReqEncoder = BincodeEncoder<Self::Req>; // TODO protobuf
-    type ReqDecoder = BincodeDecoder<Self::Req>;
+    type ReqEncoder = RepairConfigEncoder;
+    type ReqDecoder = RepairConfigDecoder;
 
     type Res = Result<()>;
-    type ResEncoder = BincodeEncoder<Self::Res>;
-    type ResDecoder = BincodeDecoder<Self::Res>;
+    type ResEncoder = EmptyResponseEncoder;
+    type ResDecoder = EmptyResponseDecoder;
 }

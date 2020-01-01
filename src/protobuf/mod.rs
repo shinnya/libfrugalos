@@ -4,8 +4,11 @@ use bytecodec::combinator::PreEncode;
 use bytecodec::SizedEncode;
 use protobuf_codec::field::branch::Branch2;
 use protobuf_codec::field::num::{F1, F2};
-use protobuf_codec::field::{MessageFieldDecoder, MessageFieldEncoder, Oneof, Optional, Repeated};
+use protobuf_codec::field::{
+    FieldDecoder, FieldEncoder, MessageFieldDecoder, MessageFieldEncoder, Oneof, Optional, Repeated,
+};
 use protobuf_codec::message::{MessageDecode, MessageDecoder, MessageEncode, MessageEncoder};
+use protobuf_codec::scalar::{Uint64Decoder, Uint64Encoder};
 use trackable::error::ErrorKindExt;
 
 use protobuf::error::{ErrorDecoder, ErrorEncoder};
@@ -17,7 +20,13 @@ pub mod entity;
 pub mod error;
 pub mod expect;
 pub mod net;
+pub mod repair;
 pub mod schema;
+
+/// Decoder for `u64`.
+pub type Uint64NewTypeDecoder = MessageDecoder<FieldDecoder<F1, Uint64Decoder>>;
+/// Encoder for `u64`.
+pub type Uint64NewTypeEncoder = MessageEncoder<FieldEncoder<F1, Uint64Encoder>>;
 
 // TODO Vec を汎用化する
 /// Decoder for `Vec`.

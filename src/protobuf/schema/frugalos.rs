@@ -611,3 +611,17 @@ impl_sized_message_encode!(
     Result<()>,
     |item: Self::Item| item
 );
+
+/// Decoder for a response of `Empty`.
+#[derive(Debug, Default)]
+pub struct EmptyResponseDecoder {
+    inner: MessageDecoder<MessageFieldDecoder<F1, ResultDecoder<EmptyMessageDecoder>>>,
+}
+impl_message_decode!(EmptyResponseDecoder, Result<()>, |r: _| Ok(r));
+
+/// Encoder for a response of `Empty`.
+#[derive(Debug, Default)]
+pub struct EmptyResponseEncoder {
+    inner: MessageEncoder<MessageFieldEncoder<F1, ResultEncoder<EmptyMessageEncoder>>>,
+}
+impl_sized_message_encode!(EmptyResponseEncoder, Result<()>, |item: Self::Item| item);
