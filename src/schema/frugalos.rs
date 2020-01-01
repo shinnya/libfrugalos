@@ -1,5 +1,4 @@
 //! frugalosの公開API系RPCのスキーマ定義。
-use bytecodec::bincode_codec::{BincodeDecoder, BincodeEncoder};
 use fibers_rpc::{Call, ProcedureId};
 use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use std::collections::BTreeSet;
@@ -18,7 +17,8 @@ use multiplicity::MultiplicityConfig;
 use protobuf::repair::{RepairConfigDecoder, RepairConfigEncoder};
 use protobuf::schema::frugalos::{
     CountFragmentsRequestDecoder, CountFragmentsRequestEncoder, CountFragmentsResponseDecoder,
-    CountFragmentsResponseEncoder, EmptyResponseDecoder, EmptyResponseEncoder,
+    CountFragmentsResponseEncoder, DeleteObjectSetFromDeviceRequestDecoder,
+    DeleteObjectSetFromDeviceRequestEncoder, EmptyResponseDecoder, EmptyResponseEncoder,
     GetObjectResponseDecoder, GetObjectResponseEncoder, HeadObjectRequestDecoder,
     HeadObjectRequestEncoder, ListObjectsRequestDecoder, ListObjectsRequestEncoder,
     ObjectRequestDecoder, ObjectRequestEncoder, PrefixRequestDecoder, PrefixRequestEncoder,
@@ -204,8 +204,8 @@ impl Call for DeleteObjectSetFromDeviceRpc {
     const NAME: &'static str = "frugalos.object.delete_object_set_from_device";
 
     type Req = DeleteObjectSetFromDeviceRequest;
-    type ReqDecoder = BincodeDecoder<Self::Req>; // TODO protobuf
-    type ReqEncoder = BincodeEncoder<Self::Req>;
+    type ReqDecoder = DeleteObjectSetFromDeviceRequestDecoder;
+    type ReqEncoder = DeleteObjectSetFromDeviceRequestEncoder;
 
     type Res = Result<()>;
     type ResDecoder = EmptyResponseDecoder;

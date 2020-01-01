@@ -4,7 +4,7 @@ use bytecodec::combinator::PreEncode;
 use protobuf_codec::field::num::{F1, F2, F3, F4, F5, F6};
 use protobuf_codec::field::{
     FieldDecoder, FieldEncoder, Fields, MaybeDefault, MessageFieldDecoder, MessageFieldEncoder,
-    Optional,
+    Optional, Repeated,
 };
 use protobuf_codec::message::{MessageDecoder, MessageEncoder};
 use protobuf_codec::scalar::{
@@ -12,10 +12,13 @@ use protobuf_codec::scalar::{
     Uint32Decoder, Uint32Encoder,
 };
 
-use entity::object::{FragmentsSummary, ObjectVersion};
+use entity::bucket::BucketId;
+use entity::device::DeviceId;
+use entity::object::{FragmentsSummary, ObjectId, ObjectVersion};
 use protobuf::consistency::{ReadConsistencyDecoder, ReadConsistencyEncoder};
 use protobuf::deadline::{decode_deadline, encode_deadline, DeadlineDecoder, DeadlineEncoder};
 use protobuf::entity::bucket::{BucketIdDecoder, BucketIdEncoder};
+use protobuf::entity::device::{DeviceIdDecoder, DeviceIdEncoder};
 use protobuf::entity::object::{
     FragmentsSummaryDecoder, FragmentsSummaryEncoder, ObjectIdDecoder, ObjectIdEncoder,
     ObjectPrefixDecoder, ObjectPrefixEncoder, ObjectRangeDecoder, ObjectRangeEncoder,
@@ -25,8 +28,8 @@ use protobuf::expect::{ExpectDecoder, ExpectEncoder};
 use protobuf::{OptionDecoder, OptionEncoder, ResultDecoder, ResultEncoder};
 use protobuf_codec::wellknown::google::protobuf::{EmptyMessageDecoder, EmptyMessageEncoder};
 use schema::frugalos::{
-    CountFragmentsRequest, HeadObjectRequest, ListObjectsRequest, ObjectRequest, PrefixRequest,
-    PutObjectRequest, RangeRequest, SegmentRequest, VersionRequest,
+    CountFragmentsRequest, DeleteObjectSetFromDeviceRequest, HeadObjectRequest, ListObjectsRequest,
+    ObjectRequest, PrefixRequest, PutObjectRequest, RangeRequest, SegmentRequest, VersionRequest,
 };
 use Result;
 
@@ -457,6 +460,52 @@ pub struct SegmentRequestEncoder {
 impl_sized_message_encode!(SegmentRequestEncoder, SegmentRequest, |t: Self::Item| {
     (t.bucket_id, t.segment as u32)
 });
+
+/// Decoder for `DeleteObjectSetFromDeviceRequest`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectSetFromDeviceRequestDecoder {
+    inner: MessageDecoder<
+        Fields<(
+            MaybeDefault<FieldDecoder<F1, BucketIdDecoder>>,
+            MaybeDefault<FieldDecoder<F2, DeviceIdDecoder>>,
+            Repeated<FieldDecoder<F3, ObjectIdDecoder>, Vec<String>>,
+        )>,
+    >,
+}
+impl_message_decode!(
+    DeleteObjectSetFromDeviceRequestDecoder,
+    DeleteObjectSetFromDeviceRequest,
+    |t: (BucketId, DeviceId, Vec<ObjectId>,)| {
+        Ok(DeleteObjectSetFromDeviceRequest {
+            bucket_id: t.0.clone(),
+            device_id: t.1.clone(),
+            object_ids: t.2.into_iter().collect(),
+        })
+    }
+);
+
+/// Encoder for `DeleteObjectSetFromDeviceRequest`.
+#[derive(Debug, Default)]
+pub struct DeleteObjectSetFromDeviceRequestEncoder {
+    inner: MessageEncoder<
+        Fields<(
+            FieldEncoder<F1, BucketIdEncoder>,
+            FieldEncoder<F2, DeviceIdEncoder>,
+            Repeated<FieldEncoder<F3, ObjectIdEncoder>, Vec<String>>,
+        )>,
+    >,
+}
+impl_message_encode!(
+    DeleteObjectSetFromDeviceRequestEncoder,
+    DeleteObjectSetFromDeviceRequest,
+    |item: Self::Item| {
+        (
+            item.bucket_id,
+            item.device_id,
+            item.object_ids.into_iter().collect(),
+        )
+    }
+);
 
 /// Decoder for a response of `GetObject`.
 #[derive(Debug, Default)]
